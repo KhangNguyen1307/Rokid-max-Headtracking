@@ -12,14 +12,95 @@ Theo dõi chuyển động đầu bằng **Rokid Max trên Windows**, kết nố
 
 Mở [Releases](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases), tải gói **Windows x64**, giải nén toàn bộ rồi mở **Kariuss Max Headtracking.exe**. Giữ thư mục `_internal` cạnh tệp `.exe`. Không cần cài Python để dùng bản đóng gói.
 
-## Sử dụng
+Gói 1.8.0 có hướng dẫn cắm dây đầy đủ: **[Windows x64 — Updated Guide](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases/download/v1.8.0/Kariuss-Max-Headtracking-1.8.0-Windows-x64-Updated-Guide.zip)**. Chọn gói này nếu tải lần đầu.
 
-1. Cắm Rokid Max vào một cổng USB có truyền dữ liệu trên PC.
+## Cắm dây để vừa có hình trên kính vừa theo dõi đầu
+
+Để chơi game qua kính, cần đủ **hình ảnh từ máy tính đến kính**, **điện cấp cho kính** và **dữ liệu chuyển động từ kính về máy tính**. Kariuss đọc chuyển động và gửi hướng nhìn vào game; nút **Kết nối game** không tự tạo đường xuất hình. Windows nhận kính như một màn hình ngoài khi đường hình ảnh hoạt động.
+
+Chọn cách cắm theo khả năng cổng của máy, không chỉ theo tên “laptop” hay “PC”:
+
+| Máy đang có gì? | Cách dùng |
+|---|---|
+| Laptop hoặc PC có USB-C xuất hình và truyền dữ liệu | Cắm trực tiếp theo **cách A** |
+| Laptop hoặc PC chỉ có USB-C truyền dữ liệu / sạc, nhưng có HDMI hoặc DisplayPort | Dùng bộ chuyển theo **cách B** |
+| Chỉ cắm kính vào USB-C truyền dữ liệu | Có thể đọc chuyển động và chơi trên màn hình máy tính; kính chưa có hình |
+
+### Cách A — Laptop có cổng USB-C xuất hình
+
+Kiểm tra thông số **đúng mẫu máy và đúng cổng** trên trang của hãng: tìm “USB-C display output”, “DisplayPort over USB-C” hoặc “DisplayPort Alt Mode”, nghĩa là cổng USB-C xuất được hình. Cổng chỉ ghi USB-C, sạc hay tốc độ USB chưa đủ để kết luận. PC có cổng USB-C với các khả năng này cũng dùng cách A. [Rokid xác nhận cách kết nối trực tiếp qua USB-C có DisplayPort](https://global.rokid.com/blogs/compatibility/which-devices-can-connect-to-rokid-max-glasses-directly).
+
+```text
+Laptop: USB-C xuất hình + dữ liệu + cấp điện
+                    │
+             Dây USB-C của kính
+                    │
+                 Rokid Max
+```
+
+1. Dùng dây USB-C đi kèm Rokid Max, cắm một đầu vào kính và đầu kia vào cổng USB-C xuất hình của máy. Dây thay thế phải truyền được hình và dữ liệu; dây chỉ sạc không phù hợp.
+2. Đeo kính để kiểm tra có thấy desktop Windows. Nếu chưa thấy, làm phần **Thiết lập hình ảnh trong Windows** bên dưới.
+3. Mở Kariuss và kiểm tra app phát hiện Rokid Max. Đặt kính trên mặt phẳng 6 giây, rồi đeo kính và reset hướng nhìn theo phần **Bắt đầu theo dõi và vào game**.
+
+Nếu chưa rõ cổng USB-C của laptop có xuất hình hay không, kiểm tra thông số trước. Laptop có HDMI nhưng USB-C không xuất hình thì dùng cách B.
+
+### Cách B — PC dùng card đồ họa, hoặc laptop không xuất hình qua USB-C
+
+Cần một **bộ chuyển chủ động đúng chiều HDMI → USB-C dành cho kính AR**, có cổng USB riêng đưa **cả nguồn điện và dữ liệu USB** về PC. Nếu dùng DisplayPort, cần loại **DisplayPort → USB-C** có đường USB dữ liệu tương ứng. Bộ chuyển USB-C → HDMI thông thường dành cho laptop ra màn hình TV có chiều ngược lại, không dùng cho sơ đồ này. [Rokid hướng dẫn dùng HDMI → USB-C cho PC có HDMI](https://global.rokid.com/blogs/compatibility/which-devices-can-be-used-with-rokid-max-glasses-via-hdmi-to-usb-c-cable).
+
+```text
+HDMI trên card đồ họa ─── hình ảnh ───┐
+                                    ├── Bộ chuyển ── dây USB-C của kính ── Rokid Max
+USB trên PC ─── nguồn + dữ liệu ─────┘
+```
+
+1. Cắm đầu **HDMI vào cổng HDMI trên card đồ họa rời** nếu PC có card rời. Ví dụ máy dùng RTX 5070 Ti: lấy hình từ cổng trên card, theo sơ đồ trên. Màn hình PC vẫn có thể dùng cổng xuất hình còn lại của card.
+2. Nối cổng **USB nguồn / dữ liệu của bộ chuyển với cổng USB trên chính PC**, bằng dây có truyền dữ liệu. PC có thể dùng cổng USB-A hoặc USB-C phù hợp với dây của bộ chuyển.
+3. Nối cổng **USB-C ra kính** của bộ chuyển với Rokid Max bằng dây của kính.
+4. Thiết lập màn hình Windows, rồi kiểm tra Kariuss vẫn phát hiện kính và mô hình quay theo đầu.
+
+**Cấp điện từ củ sạc hoặc pin dự phòng không tạo đường dữ liệu về PC.** Muốn dùng Kariuss đồng thời với hình ảnh, cần đường USB nối về máy đang chạy Kariuss. Cắm cổng nguồn vào PC cũng chỉ đủ khi chính bộ chuyển và dây đó thực sự truyền dữ liệu.
+
+**Trước khi mua bộ chuyển, hỏi người bán:** “Bộ này có đưa dữ liệu USB của Rokid Max về PC để đọc cảm biến chuyển động đầu không, hay cổng USB chỉ cấp nguồn?” Dòng quảng cáo “dùng được kính AR”, “HDMI sang Type-C” hoặc “có cổng nguồn” chưa xác nhận điều đó. Với mẫu Hagibis có ba đầu/cổng HDMI, USB nguồn và USB-C ra kính, cách cắm theo đúng vai trò như trên; **chưa xác nhận mọi mẫu / phiên bản Hagibis đều truyền được dữ liệu cảm biến Rokid Max**. Bộ chuyển chỉ cho hình mà không có USB dữ liệu sẽ không đủ cho mục tiêu vừa có hình vừa theo dõi đầu. Không thay bộ chuyển bằng dây chia USB-C thông thường.
+
+### Thiết lập hình ảnh trong Windows
+
+1. Mở **Cài đặt / Settings → Hệ thống / System → Màn hình / Display**. Chọn **Nhận diện / Identify** để xác định màn hình của kính. Nếu chưa xuất hiện, kiểm tra dây, nguồn và khả năng xuất hình, rồi dùng **Multiple displays → Detect**.
+2. Để dễ thử lần đầu, nhấn **Windows + P → Duplicate (Nhân bản)**: kính và màn hình máy tính hiện cùng nội dung. Khi đó game đang hiện trên màn hình PC cũng hiện trong kính.
+3. Nếu muốn chỉ để game trên kính, chọn **Extend (Mở rộng)**. Chọn màn hình kính trong phần chọn màn hình của game nếu có; hoặc chuyển game sang dạng cửa sổ và kéo sang kính. Nếu game luôn mở trên màn hình PC, có thể đặt màn hình kính làm **Make this my main display** trước khi mở game. Ở chế độ Extend, thấy desktop trống trên kính không có nghĩa là kết nối hỏng: game có thể đang nằm trên màn hình khác.
+4. Khi thử lần đầu, dùng chế độ **2D thông thường**, bắt đầu với **1920 × 1080, 60 Hz nếu Windows có liệt kê**. Chọn màn hình kính rồi vào **Advanced display** để xem tần số hình ảnh có sẵn. Mức cao hơn chỉ dùng khi kính, cáp và bộ chuyển cùng hỗ trợ. **60 Hz của màn hình khác với 100 / 200 Hz “Tần số gửi” trong Kariuss.**
+
+Các chế độ Duplicate / Extend và cách nhận diện màn hình được giải thích trong [hướng dẫn Microsoft](https://support.microsoft.com/en-us/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows); cách chọn tần số hình ảnh ở [Advanced display](https://support.microsoft.com/en-us/windows/hardware/display-graphics/change-the-refresh-rate-on-your-monitor-in-windows). [Rokid ghi độ phân giải mặc định của Max là 1920 × 1080](https://global.rokid.com/blogs/max-2/the-resolution-of-max2-connected-to-station1-is-also-limited-to-1080-right-the-default-resolution-of-both-max2-and-max-is-1920-1080-right-when-connecting-with-station2-it-can-realize-max-1200).
+
+### Dùng loa trên kính
+
+Mở **Settings → System → Sound → Output** và chọn thiết bị phát âm thanh tương ứng kính / đường HDMI nếu Windows liệt kê. Tên có thể là Rokid Max hoặc tên màn hình / thiết bị âm thanh của card đồ họa, tùy đường kết nối. Thử phát một âm thanh và kiểm tra âm lượng trên kính. Khả năng có tiếng phụ thuộc cả bộ chuyển và đường âm thanh; không chỉ việc app đã nhận chuyển động. [Microsoft hướng dẫn chọn đầu ra âm thanh USB / HDMI](https://support.microsoft.com/en-gb/windows/hardware/audio/fix-sound-or-audio-problems-in-windows?nochrome=true).
+
+### Kiểm tra đủ hai phần trước khi vào game
+
+- **Hình ảnh:** nhìn được desktop Windows hoặc cửa sổ game trên kính.
+- **Theo dõi đầu:** Kariuss thấy kính; sau 6 giây hiệu chỉnh, mô hình và các góc thay đổi khi quay đầu.
+
+| Hiện tượng | Kiểm tra gì trước? |
+|---|---|
+| Kariuss nhận kính nhưng kính tối | Cổng USB-C có xuất hình không; đúng chiều bộ chuyển; nguồn; dây truyền hình; màn hình đã bật trong Windows |
+| Kính có hình nhưng Kariuss không thấy kính | Bộ chuyển có truyền USB dữ liệu không; dây USB có truyền dữ liệu không; cổng nguồn / dữ liệu đã nối về PC chưa |
+| Kính và app đều chưa hoạt động | Cắm đủ các đầu dây; kiểm tra nguồn; thử dây và cổng phù hợp khác |
+| Kính có desktop nhưng không có game | Kiểm tra Duplicate / Extend và game đang ở màn hình nào |
+| Mô hình quay đúng nhưng game chưa quay | Bật Kết nối game, tắt OpenTrack, kiểm tra tùy chọn theo dõi đầu / TrackIR trong game; nếu cần khởi động lại game khi Kariuss đang bật kết nối |
+
+Kết nối game với Rokid Max đã được người dùng thử trong Flight Simulator 2024; **hình ảnh và loa qua bộ chuyển Hagibis chưa được kiểm tra thực tế trong dự án này**. Hướng dẫn bộ chuyển nêu điều kiện cần và cách kiểm tra, không phải danh sách sản phẩm đã xác nhận tương thích.
+
+## Bắt đầu theo dõi và vào game
+
+1. Cắm Rokid Max theo cách A hoặc B ở trên. Kiểm tra cả hình ảnh và dữ liệu USB nếu muốn chơi ngay trên kính. Nếu chỉ thử theo dõi đầu trên màn hình PC, cổng USB có dữ liệu là đủ.
 2. Mở app. Chọn kính trong ô thiết bị nếu có nhiều kính; tên thiết bị không hiện số sê-ri.
 3. **Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh.**
 4. Đeo kính, nhìn thẳng rồi bấm **Reset góc nhìn** hoặc **F8**.
 5. Tắt OpenTrack nếu đang mở. Bấm **Kết nối game**, mở game và vào buồng lái.
 6. Nếu game chưa nhận, giữ kết nối Kariuss đang bật rồi khởi động lại game.
+
+Quy trình này dùng game ở chế độ màn hình thông thường, với chuyển động đầu điều khiển góc nhìn trong game. Kết nối hình ảnh và kết nối theo dõi đầu là hai phần cần kiểm tra riêng.
 
 Ô **Tiếng Việt / English** ở góc trên bên phải đổi ngôn ngữ ngay, gồm nút, trạng thái, nhật ký đang hiển thị và menu cạnh đồng hồ. Lựa chọn được lưu tự động; đổi ngôn ngữ không đổi cài đặt theo dõi. Bản nâng cấp giữ tiếng Việt cho người dùng cũ; lần chạy đầu trên Windows dùng ngôn ngữ khác tiếng Việt sẽ mặc định English.
 
@@ -53,9 +134,7 @@ App kiểm tra tiến trình game khoảng mỗi giây. Màu xanh không phải 
 
 **Tần số gửi:** 44,4 / 50 / 80 / 100 / 140 / 200 Hz, mặc định 100 Hz. Đây là số lượt cập nhật hướng nhìn ra game mỗi giây, khác với số gói app nhận từ kính. Nhịp thực tế có thể thấp hơn khi máy bận. Reset được xử lý ngay.
 
-## Hình ảnh trên kính và FPV
-
-App đọc cảm biến; tín hiệu hình ảnh cần đường xuất hình riêng từ PC. Cổng USB-C chỉ có dữ liệu không tự tạo được hình ảnh trên kính. Nếu dùng bộ chuyển HDMI/DisplayPort sang USB-C, cần kiểm tra bộ chuyển có truyền dữ liệu USB để app vẫn đọc được kính.
+## FPV
 
 **Chưa hỗ trợ điều khiển camera FPV thật.** Các mức tần số đã chuẩn bị cho việc phát triển phần này, chưa có ngõ ra PPM, PWM, SBUS hoặc CRSF. Có tham khảo [HeadTracker](https://github.com/headtracker/HeadTracker) về các mức gửi; không đưa mã firmware của dự án đó vào app.
 
@@ -78,4 +157,3 @@ Nhật ký và cài đặt của bản đóng gói nằm trong `%LOCALAPPDATA%/K
 Mã Kariuss được phát hành theo **GNU GPL v3.0**; xem [LICENSE](LICENSE). Các thành phần bên thứ ba giữ giấy phép và thông tin tác giả riêng; xem [THIRD_PARTY.md](THIRD_PARTY.md) và thư mục `licenses/`.
 
 Ghi nhận: [OpenTrack](https://github.com/opentrack/opentrack), [VQF](https://github.com/dlaidig/vqf), [ar-drivers-rs](https://github.com/badicsalex/ar-drivers-rs) (tham khảo bố cục gói Rokid), [pystray](https://github.com/moses-palmer/pystray), [cython-hidapi](https://github.com/trezor/cython-hidapi).
-

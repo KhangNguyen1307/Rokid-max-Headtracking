@@ -1,163 +1,158 @@
-KARIUSS MAX HEADTRACKING
+# Kariuss Max Headtracking
 
-English instructions: User Guide.txt / README_EN.md.
-Đổi ngôn ngữ ở ô Tiếng Việt / English góc trên bên phải; lựa chọn tự lưu và giữ nguyên cài đặt theo dõi.
+**[English documentation](README_EN.md) · Tiếng Việt**
 
-Bản 1.8.0: thêm Tiếng Việt / English; chọn thiết bị USB không hiện số sê-ri; các mức độ mượt dùng tên ngắn gọn.
 
-Giao diện tối đồng bộ: nền, nút, thông tin USB, mô hình kính và nhật ký.
+Theo dõi chuyển động đầu bằng **Rokid Max trên Windows**, kết nối trực tiếp với game qua FreeTrack / TrackIR. Không cần mở ứng dụng OpenTrack riêng.
 
-NÚT KẾT NỐI GAME
-Bấm "Kết nối game" để bật hoặc tắt việc gửi hướng nhìn vào game.
-Màu xanh: game đã đăng ký kết nối và tiến trình game có thành phần nhận dữ liệu còn đang chạy.
-Màu đỏ: đã bật nhưng chưa có game kết nối, hoặc không bật được kết nối game.
-Màu bình thường: đã tắt kết nối game.
-App kiểm tra lại game đang chạy khoảng mỗi giây; thoát game thì nút trở lại màu đỏ.
-Chữ "Kết nối game" được giữ nguyên ở cả ba trạng thái; chi tiết hiện ngay bên dưới.
+**Bản thử 1.8.0 — Tiếng Việt / English.** Đã được người dùng thử với Rokid Max và Microsoft Flight Simulator 2024. Chưa xác nhận hỗ trợ các mẫu kính hoặc game khác.
 
-1. Cắm kính vào PC. Mở Kariuss Max Headtracking từ Desktop hoặc menu Start.
-2. Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh.
-3. Đeo kính, nhìn thẳng và bấm "Reset góc nhìn".
-4. Quay đầu trái/phải, ngẩng/cúi, nghiêng đầu. Quan sát ba số trên màn hình PC.
-5. F8 đặt lại hướng nhìn thẳng, kể cả khi cửa sổ này không được chọn.
+## Tải app
 
-MÔ HÌNH KÍNH 3D TRÊN TRANG CHÍNH
-Mô hình nhỏ nằm ngay trên trang chính, cạnh ba số chuyển động, không có khung nền riêng.
-Góc nhìn từ sau người đeo: kính mặc định hướng vào màn hình.
-Khi ba góc bằng 0, kính nằm thẳng hàng; không thêm góc nghiêng trang trí.
-Dấu chữ thập đứng yên làm mốc để so hướng và độ nghiêng của kính.
-Chữ dưới kính báo đang tìm kính, đang làm quen, đang theo dõi hoặc đã ngắt kết nối.
-Các ô Đảo chiều cũng đổi chiều chuyển động của mô hình.
-F8 / Nhìn về giữa đưa mô hình về tư thế nhìn thẳng.
-Chiều nghiêng trên mô hình được sửa riêng; không thay chiều điều khiển game.
-Mô hình minh họa hình kính để quan sát hướng, không phải bản đo kích thước chính xác của Rokid Max.
-Khi tạm dừng gửi hướng nhìn vào game, mô hình vẫn quay theo kính để bạn quan sát.
-Khi chưa nhận kính, mô hình đứng yên và báo đang chờ kính sẵn sàng.
-Khi cửa sổ chạy ngầm, app ngừng vẽ mô hình nhưng tiếp tục theo dõi chuyển động.
+Mở [Releases](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases), tải gói **Windows x64**, giải nén toàn bộ rồi mở **Kariuss Max Headtracking.exe**. Giữ thư mục `_internal` cạnh tệp `.exe`. Không cần cài Python để dùng bản đóng gói.
 
-NHẬT KÝ HOẠT ĐỘNG
-Bảng ở cuối cửa sổ ghi thời gian theo giờ Việt Nam / Thái Lan (UTC+7).
-Mỗi dòng có dạng: HH:mm:ss DD/MM/YYYY  Hành động.
-Reset góc nhìn bằng nút, F8 hoặc nút kính đều được ghi vào bảng.
-Kết nối, mất kết nối, sẵn sàng, tạm dừng / tiếp tục và chạy ngầm đều có nhật ký.
-Bảng chỉ hiện các hành động và thay đổi trạng thái, không ghi mỗi mẫu chuyển động.
-Cuộn để xem các dòng cũ; bảng giữ tối đa 500 dòng của lần chạy hiện tại.
-Nhật ký đầy đủ được lưu trong activity.log cùng thư mục cài đặt người dùng.
+Gói 1.8.0 có hướng dẫn cắm dây đầy đủ: **[Windows x64 — Updated Guide](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases/download/v1.8.0/Kariuss-Max-Headtracking-1.8.0-Windows-x64-Updated-Guide.zip)**. Chọn gói này nếu tải lần đầu.
 
-KẾT NỐI TRỰC TIẾP VỚI GAME
-1. Tắt OpenTrack nếu đang mở.
-2. Mở Kariuss, chờ kính sẵn sàng, nhìn thẳng và bấm "Reset góc nhìn".
-3. Bấm nút "Kết nối game". App nhớ lựa chọn bật / tắt cho lần mở sau.
-4. Mở Flight Simulator 2024, vào buồng lái và quay đầu để nhìn quanh.
-5. Nếu game chưa nhận, giữ Kariuss đang bật kết nối và khởi động lại game.
-Không cần mở OpenTrack, chọn hồ sơ, hay bấm Start trong một app thứ hai.
-Kết nối dùng kiểu FreeTrack / TrackIR mà OpenTrack trước đó đã dùng với game.
-Nếu game có công tắc theo dõi đầu / TrackIR, bật công tắc đó.
-Kính chưa có hình vẫn thử cảm biến và chơi trên màn hình PC được.
-Kariuss gửi ba hướng quay trực tiếp; mô hình và các ô Đảo chiều vẫn hoạt động như trước.
-Nếu nhìn sai chiều, dùng ô "Đảo chiều" tương ứng ở cửa sổ kính.
-Nhật ký báo "Game đã nhận kết nối Kariuss" khi game đăng ký nhận hướng nhìn.
-Dòng tên game và màu xanh xuất hiện khi game đã đăng ký và thành phần nhận dữ liệu còn được nạp trong tiến trình đang chạy.
-Bấm nút "Kết nối game" lần nữa để dừng gửi và trả cài đặt kết nối Windows về như trước.
-Kariuss không gửi cùng lúc với OpenTrack; app sẽ yêu cầu tắt OpenTrack để tránh trùng kết nối.
-Bản trước dùng OpenTrack đã được người dùng xác nhận hoạt động với Flight Simulator 2024.
-Bản tích hợp 1.4.0 đã được người dùng xác nhận quay đầu điều khiển được game;
-người dùng thấy nhạy và chưa mượt. Bản 1.5.0 thêm lớp làm mượt từ Accela để xử lý việc này.
-Các kiểm tra tự động xác nhận nhận dữ liệu trong tiến trình riêng, giảm rung nhỏ,
-phản hồi quay nhanh, reset tức thì, tạm dừng và chạy ngầm.
-Ngày 04/10/2026, người dùng thử bản 1.5.0 trong Flight Simulator 2024 và xác nhận:
-"Đã mượt hơn và độ nhạy ổn" với mức "Như OpenTrack" + độ nhạy 80%, không mở OpenTrack.
-Chương trình chỉ cập nhật hướng nhìn khi đang nhận dữ liệu mới từ kính, chỉ trong máy này.
-Ba số vị trí luôn là 0: bản thử chỉ đọc quay đầu, chưa đọc chuyển động tịnh tiến.
+## Cắm dây để vừa có hình trên kính vừa theo dõi đầu
 
-ĐỘ MƯỢT VÀ ĐỘ NHẠY
-Hai ô nằm ngay trên trang chính và tự lưu lựa chọn.
-Độ mượt "Mượt vừa": giữ mức trước đây mang tên "Như OpenTrack", với mức 1,5 và bỏ rung rất nhỏ 0,03 độ.
-"Mượt nhẹ": theo đầu nhanh hơn, lọc ít hơn. "Mượt nhiều": giảm rung mạnh hơn, phản hồi chậm hơn.
-"Tắt": bỏ lớp làm mượt để so sánh, vẫn giữ xử lý cảm biến ban đầu.
-Độ nhạy mặc định 80%: quay đầu 30 độ thì góc nhìn game thay đổi khoảng 24 độ khi đã theo kịp.
-100% giữ tỷ lệ quay như cấu hình OpenTrack cũ. Chọn 60% nếu còn quá nhạy; 120% nếu muốn quay ít mà nhìn xa hơn.
-Bộ lọc dùng ý tưởng và đường phản hồi Accela của OpenTrack, chuyển sang chạy bên trong Kariuss.
-Có giới hạn bước cập nhật để tránh nhảy mạnh nếu cửa sổ bị chậm; không khẳng định giống tuyệt đối mọi thời điểm.
-Mô hình và ba số vẫn biểu diễn chuyển động kính thực, không bị thay đổi bởi độ nhạy gửi vào game.
-Reset góc nhìn xóa cả lịch sử bộ lọc, nên không phải chờ góc nhìn từ từ trở về giữa.
-Tạm dừng giữ đúng góc đã gửi vào game, dù bạn quay đầu tiếp.
-Tham khảo: https://github.com/opentrack/opentrack/blob/master/filter-accela/ftnoir_filter_accela.cpp
+Để chơi game qua kính, cần đủ **hình ảnh từ máy tính đến kính**, **điện cấp cho kính** và **dữ liệu chuyển động từ kính về máy tính**. Kariuss đọc chuyển động và gửi hướng nhìn vào game; nút **Kết nối game** không tự tạo đường xuất hình. Windows nhận kính như một màn hình ngoài khi đường hình ảnh hoạt động.
 
-TẦN SỐ GỬI
-Ô "Tần số gửi" thay dòng đếm số lần đọc kính trước đây.
-Các mức: 44,4 / 50 / 80 / 100 / 140 / 200 Hz. Mặc định 100 Hz cho game.
-100 Hz nghĩa là app gửi hướng nhìn khoảng 100 lần mỗi giây.
-Đổi mức áp dụng ngay, tự lưu và không cần ngắt kết nối kính hay khởi động lại app.
-Mức này chỉnh nhịp gửi dữ liệu ra game, không đổi nhịp cảm biến bên trong Rokid Max.
-App vẫn đọc đủ dữ liệu kính để giữ bộ lọc và việc nhận nút hoạt động chính xác.
-Nhịp gửi chạy riêng với việc vẽ cửa sổ; vẫn hoạt động khi app được ẩn xuống cạnh đồng hồ.
-Reset góc nhìn được gửi ngay, không phải chờ lượt gửi kế tiếp của mức tần số thấp.
-Nếu máy bị chậm, app bỏ lượt đã trễ thay vì gửi dồn những hướng nhìn cũ.
-Đây là mức gửi mục tiêu. Số lượt thực tế có thể thấp hơn nếu Windows hoặc game làm máy quá tải.
+Chọn cách cắm theo khả năng cổng của máy, không chỉ theo tên “laptop” hay “PC”:
 
-THAM KHẢO FPV TỪ HEADTRACKER
-Nguồn: https://github.com/headtracker/HeadTracker (tham khảo mã nguồn ngày 04/10/2026).
-Ngõ ra servo PWM của dự án: 50 Hz.
-PPM mặc định có khung 22.500 micro giây, tương đương khoảng 44,4 Hz.
-SBUS mặc định: 80 Hz. CRSF mặc định: 140 Hz; hai mức này được cấu hình trong dự án.
-Cảm biến được đọc khoảng 150 Hz; đây là nhịp đọc, khác với nhịp gửi.
-Không có một mức tần số FPV chung cho mọi tay điều khiển và servo.
-Ô tần số hiện tại hoạt động với kết nối game của Kariuss. App chưa gửi tín hiệu tới camera FPV.
-Sau này cần thêm kết nối ra tay điều khiển / thiết bị điều khiển camera phù hợp.
-Mã cấu hình: https://github.com/headtracker/HeadTracker/blob/master/firmware/src/src/basetrackersettings.h
-Chu kỳ: https://github.com/headtracker/HeadTracker/blob/master/firmware/src/src/include/defines.h
-Ngõ ra servo: https://github.com/headtracker/HeadTracker/blob/master/firmware/src/src/pwm.cpp
-Nếu rút kính, cắm lại: app tự thử kết nối lại. Chờ khoảng 6 giây sau khi nhận kính.
+| Máy đang có gì? | Cách dùng |
+|---|---|
+| Laptop hoặc PC có USB-C xuất hình và truyền dữ liệu | Cắm trực tiếp theo **cách A** |
+| Laptop hoặc PC chỉ có USB-C truyền dữ liệu / sạc, nhưng có HDMI hoặc DisplayPort | Dùng bộ chuyển theo **cách B** |
+| Chỉ cắm kính vào USB-C truyền dữ liệu | Có thể đọc chuyển động và chơi trên màn hình máy tính; kính chưa có hình |
 
-KẾT NỐI USB VÀ CHẠY NGẦM
-Ô chọn thiết bị USB nằm cạnh nút Kết nối / Ngắt kết nối ở đầu cửa sổ.
-App tự nhận kính đang cắm; danh sách chỉ hiện tên kính và số thứ tự USB, không hiện số sê-ri.
-Ngắt kết nối dừng đọc kính và dừng gửi chuyển động; app vẫn mở.
-Kết nối thử lại ngay. Tìm lại USB quét danh sách và mở lại kết nối đang dùng.
-Sau khi rút / cắm lại dây, app tự nhận lại nếu bạn chưa chủ động Ngắt kết nối.
-Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh sau mỗi lần kết nối.
-Bấm dấu × chỉ ẩn cửa sổ; việc đọc kính và gửi chuyển động vẫn chạy.
-Biểu tượng kính nằm cạnh đồng hồ Windows, có thể ở trong nút mũi tên ^.
-Nhấp đúp biểu tượng để mở lại. Nhấp phải để nhìn về giữa, tạm dừng, kết nối hoặc Thoát hẳn.
-Mở lại biểu tượng Desktop khi app đang chạy sẽ đưa cửa sổ cũ lên, không mở thêm bản thứ hai.
-Để dừng app hoàn toàn, dùng nút Thoát hẳn trong app hoặc menu của biểu tượng cạnh đồng hồ.
-F8 và các nút đã gán trên kính vẫn hoạt động khi cửa sổ bị ẩn.
-Nếu không tạo được biểu tượng cạnh đồng hồ, dấu × sẽ thu cửa sổ xuống thanh tác vụ để bạn mở lại được.
-Kariuss tự gửi dữ liệu cho game, không tự mở ứng dụng OpenTrack.
-App có kèm các thành phần kết nối nhỏ của OpenTrack 2026.1.0, cùng ghi nhận nguồn và giấy phép.
-TrackIR.exe là thành phần hỗ trợ chạy ẩn cùng kết nối game và được đóng khi tắt kết nối / Thoát hẳn.
+### Cách A — Laptop có cổng USB-C xuất hình
 
-Đây là bản thử. Cần xác nhận chiều quay, độ trôi khi ngồi yên và hoạt động trong game.
-Chưa điều khiển camera FPV.
-Khi dùng kính để hiện hình, adapter phải truyền cả hình và dữ liệu USB về PC.
+Kiểm tra thông số **đúng mẫu máy và đúng cổng** trên trang của hãng: tìm “USB-C display output”, “DisplayPort over USB-C” hoặc “DisplayPort Alt Mode”, nghĩa là cổng USB-C xuất được hình. Cổng chỉ ghi USB-C, sạc hay tốc độ USB chưa đủ để kết luận. PC có cổng USB-C với các khả năng này cũng dùng cách A. [Rokid xác nhận cách kết nối trực tiếp qua USB-C có DisplayPort](https://global.rokid.com/blogs/compatibility/which-devices-can-connect-to-rokid-max-glasses-directly).
 
-NÚT TRÊN KÍNH
-Mở mục "Nút trên kính" trong app. Mỗi nút có thể chọn giữ chức năng gốc,
-nhìn về giữa, hoặc tạm dừng / tiếp tục nhìn theo đầu. Các lựa chọn tự lưu.
-Mặc định: các nút bấm riêng giữ chức năng gốc; bấm tăng rồi giảm âm lượng
-(hoặc giảm rồi tăng) trong 0,8 giây sẽ nhìn về giữa. Âm lượng phải quay về đúng
-mức trước hai lần bấm. Hai lần bấm này không chạy chức năng đã gán cho nút bấm riêng.
-Khi bật cách bấm đôi, chức năng gán cho nút âm lượng bấm riêng chờ tối đa 0,8 giây.
-Ở mức âm lượng cao nhất: dùng giảm rồi tăng. Ở mức thấp nhất: dùng tăng rồi giảm.
-App nhận nút qua thay đổi âm lượng / độ sáng; bấm thêm khi đã chạm giới hạn có thể không được nhận.
-Bấm từng lần, không dùng nhấn giữ để ra lệnh cho app.
-Nút độ sáng vẫn đổi độ sáng, dù đã gán thêm chức năng nhìn về giữa.
-App chưa chặn chức năng gốc và chưa tự khôi phục độ sáng / âm lượng trên kính.
-Muốn giữ độ sáng, dùng cách bấm đôi âm lượng hoặc F8.
-Tạm dừng giữ yên hướng nhìn gửi vào game; cảm biến vẫn được đọc.
-Khi tiếp tục, hướng đang nhìn được lấy làm hướng giữa. Mở lại app sẽ bỏ trạng thái tạm dừng.
+```text
+Laptop: USB-C xuất hình + dữ liệu + cấp điện
+                    │
+             Dây USB-C của kính
+                    │
+                 Rokid Max
+```
 
-HÌNH VÀ TIẾNG QUA BỘ CHUYỂN ĐỔI
-Hagibis HTD01: HDMI cắm vào card đồ họa; cổng nguồn / dữ liệu nối USB với PC;
-cổng ra USB-C nối kính bằng dây của kính. Cổng nguồn / dữ liệu phải nối PC để giữ head tracking.
-Sau khi kính lên hình, mở Cài đặt Windows > Hệ thống > Âm thanh, chọn đầu ra
-âm thanh mới tương ứng kính / HDMI. Tên hiển thị phụ thuộc Windows và bộ chuyển đổi.
-Chưa thử hình và loa qua bộ chuyển đổi trên máy này.
+1. Dùng dây USB-C đi kèm Rokid Max, cắm một đầu vào kính và đầu kia vào cổng USB-C xuất hình của máy. Dây thay thế phải truyền được hình và dữ liệu; dây chỉ sạc không phù hợp.
+2. Đeo kính để kiểm tra có thấy desktop Windows. Nếu chưa thấy, làm phần **Thiết lập hình ảnh trong Windows** bên dưới.
+3. Mở Kariuss và kiểm tra app phát hiện Rokid Max. Đặt kính trên mặt phẳng 6 giây, rồi đeo kính và reset hướng nhìn theo phần **Bắt đầu theo dõi và vào game**.
 
-Nguồn giao thức: https://github.com/badicsalex/ar-drivers-rs/blob/master/src/rokid.rs
-Nguồn tham khảo: https://github.com/prione/UDP-tracker-for-rokid-max
-Bộ lọc: vqf 2.1.2 (MIT) https://github.com/dlaidig/vqf
-Đọc USB: hidapi 0.15.0 (BSD) https://github.com/trezor/cython-hidapi
-Bản app .exe kèm những thư viện cần thiết, không cần môi trường Codex để mở.
-Chỉ đã kiểm tra trên máy Windows này; các máy khác cần thử lại kính và kết nối với game.
+Nếu chưa rõ cổng USB-C của laptop có xuất hình hay không, kiểm tra thông số trước. Laptop có HDMI nhưng USB-C không xuất hình thì dùng cách B.
+
+### Cách B — PC dùng card đồ họa, hoặc laptop không xuất hình qua USB-C
+
+Cần một **bộ chuyển chủ động đúng chiều HDMI → USB-C dành cho kính AR**, có cổng USB riêng đưa **cả nguồn điện và dữ liệu USB** về PC. Nếu dùng DisplayPort, cần loại **DisplayPort → USB-C** có đường USB dữ liệu tương ứng. Bộ chuyển USB-C → HDMI thông thường dành cho laptop ra màn hình TV có chiều ngược lại, không dùng cho sơ đồ này. [Rokid hướng dẫn dùng HDMI → USB-C cho PC có HDMI](https://global.rokid.com/blogs/compatibility/which-devices-can-be-used-with-rokid-max-glasses-via-hdmi-to-usb-c-cable).
+
+```text
+HDMI trên card đồ họa ─── hình ảnh ───┐
+                                    ├── Bộ chuyển ── dây USB-C của kính ── Rokid Max
+USB trên PC ─── nguồn + dữ liệu ─────┘
+```
+
+1. Cắm đầu **HDMI vào cổng HDMI trên card đồ họa rời** nếu PC có card rời. Ví dụ máy dùng RTX 5070 Ti: lấy hình từ cổng trên card, theo sơ đồ trên. Màn hình PC vẫn có thể dùng cổng xuất hình còn lại của card.
+2. Nối cổng **USB nguồn / dữ liệu của bộ chuyển với cổng USB trên chính PC**, bằng dây có truyền dữ liệu. PC có thể dùng cổng USB-A hoặc USB-C phù hợp với dây của bộ chuyển.
+3. Nối cổng **USB-C ra kính** của bộ chuyển với Rokid Max bằng dây của kính.
+4. Thiết lập màn hình Windows, rồi kiểm tra Kariuss vẫn phát hiện kính và mô hình quay theo đầu.
+
+**Cấp điện từ củ sạc hoặc pin dự phòng không tạo đường dữ liệu về PC.** Muốn dùng Kariuss đồng thời với hình ảnh, cần đường USB nối về máy đang chạy Kariuss. Cắm cổng nguồn vào PC cũng chỉ đủ khi chính bộ chuyển và dây đó thực sự truyền dữ liệu.
+
+**Trước khi mua bộ chuyển, hỏi người bán:** “Bộ này có đưa dữ liệu USB của Rokid Max về PC để đọc cảm biến chuyển động đầu không, hay cổng USB chỉ cấp nguồn?” Dòng quảng cáo “dùng được kính AR”, “HDMI sang Type-C” hoặc “có cổng nguồn” chưa xác nhận điều đó. Với mẫu Hagibis có ba đầu/cổng HDMI, USB nguồn và USB-C ra kính, cách cắm theo đúng vai trò như trên; **chưa xác nhận mọi mẫu / phiên bản Hagibis đều truyền được dữ liệu cảm biến Rokid Max**. Bộ chuyển chỉ cho hình mà không có USB dữ liệu sẽ không đủ cho mục tiêu vừa có hình vừa theo dõi đầu. Không thay bộ chuyển bằng dây chia USB-C thông thường.
+
+### Thiết lập hình ảnh trong Windows
+
+1. Mở **Cài đặt / Settings → Hệ thống / System → Màn hình / Display**. Chọn **Nhận diện / Identify** để xác định màn hình của kính. Nếu chưa xuất hiện, kiểm tra dây, nguồn và khả năng xuất hình, rồi dùng **Multiple displays → Detect**.
+2. Để dễ thử lần đầu, nhấn **Windows + P → Duplicate (Nhân bản)**: kính và màn hình máy tính hiện cùng nội dung. Khi đó game đang hiện trên màn hình PC cũng hiện trong kính.
+3. Nếu muốn chỉ để game trên kính, chọn **Extend (Mở rộng)**. Chọn màn hình kính trong phần chọn màn hình của game nếu có; hoặc chuyển game sang dạng cửa sổ và kéo sang kính. Nếu game luôn mở trên màn hình PC, có thể đặt màn hình kính làm **Make this my main display** trước khi mở game. Ở chế độ Extend, thấy desktop trống trên kính không có nghĩa là kết nối hỏng: game có thể đang nằm trên màn hình khác.
+4. Khi thử lần đầu, dùng chế độ **2D thông thường**, bắt đầu với **1920 × 1080, 60 Hz nếu Windows có liệt kê**. Chọn màn hình kính rồi vào **Advanced display** để xem tần số hình ảnh có sẵn. Mức cao hơn chỉ dùng khi kính, cáp và bộ chuyển cùng hỗ trợ. **60 Hz của màn hình khác với 100 / 200 Hz “Tần số gửi” trong Kariuss.**
+
+Các chế độ Duplicate / Extend và cách nhận diện màn hình được giải thích trong [hướng dẫn Microsoft](https://support.microsoft.com/en-us/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows); cách chọn tần số hình ảnh ở [Advanced display](https://support.microsoft.com/en-us/windows/hardware/display-graphics/change-the-refresh-rate-on-your-monitor-in-windows). [Rokid ghi độ phân giải mặc định của Max là 1920 × 1080](https://global.rokid.com/blogs/max-2/the-resolution-of-max2-connected-to-station1-is-also-limited-to-1080-right-the-default-resolution-of-both-max2-and-max-is-1920-1080-right-when-connecting-with-station2-it-can-realize-max-1200).
+
+### Dùng loa trên kính
+
+Mở **Settings → System → Sound → Output** và chọn thiết bị phát âm thanh tương ứng kính / đường HDMI nếu Windows liệt kê. Tên có thể là Rokid Max hoặc tên màn hình / thiết bị âm thanh của card đồ họa, tùy đường kết nối. Thử phát một âm thanh và kiểm tra âm lượng trên kính. Khả năng có tiếng phụ thuộc cả bộ chuyển và đường âm thanh; không chỉ việc app đã nhận chuyển động. [Microsoft hướng dẫn chọn đầu ra âm thanh USB / HDMI](https://support.microsoft.com/en-gb/windows/hardware/audio/fix-sound-or-audio-problems-in-windows?nochrome=true).
+
+### Kiểm tra đủ hai phần trước khi vào game
+
+- **Hình ảnh:** nhìn được desktop Windows hoặc cửa sổ game trên kính.
+- **Theo dõi đầu:** Kariuss thấy kính; sau 6 giây hiệu chỉnh, mô hình và các góc thay đổi khi quay đầu.
+
+| Hiện tượng | Kiểm tra gì trước? |
+|---|---|
+| Kariuss nhận kính nhưng kính tối | Cổng USB-C có xuất hình không; đúng chiều bộ chuyển; nguồn; dây truyền hình; màn hình đã bật trong Windows |
+| Kính có hình nhưng Kariuss không thấy kính | Bộ chuyển có truyền USB dữ liệu không; dây USB có truyền dữ liệu không; cổng nguồn / dữ liệu đã nối về PC chưa |
+| Kính và app đều chưa hoạt động | Cắm đủ các đầu dây; kiểm tra nguồn; thử dây và cổng phù hợp khác |
+| Kính có desktop nhưng không có game | Kiểm tra Duplicate / Extend và game đang ở màn hình nào |
+| Mô hình quay đúng nhưng game chưa quay | Bật Kết nối game, tắt OpenTrack, kiểm tra tùy chọn theo dõi đầu / TrackIR trong game; nếu cần khởi động lại game khi Kariuss đang bật kết nối |
+
+Kết nối game với Rokid Max đã được người dùng thử trong Flight Simulator 2024; **hình ảnh và loa qua bộ chuyển Hagibis chưa được kiểm tra thực tế trong dự án này**. Hướng dẫn bộ chuyển nêu điều kiện cần và cách kiểm tra, không phải danh sách sản phẩm đã xác nhận tương thích.
+
+## Bắt đầu theo dõi và vào game
+
+1. Cắm Rokid Max theo cách A hoặc B ở trên. Kiểm tra cả hình ảnh và dữ liệu USB nếu muốn chơi ngay trên kính. Nếu chỉ thử theo dõi đầu trên màn hình PC, cổng USB có dữ liệu là đủ.
+2. Mở app. Chọn kính trong ô thiết bị nếu có nhiều kính; tên thiết bị không hiện số sê-ri.
+3. **Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh.**
+4. Đeo kính, nhìn thẳng rồi bấm **Reset góc nhìn** hoặc **F8**.
+5. Tắt OpenTrack nếu đang mở. Bấm **Kết nối game**, mở game và vào buồng lái.
+6. Nếu game chưa nhận, giữ kết nối Kariuss đang bật rồi khởi động lại game.
+
+Quy trình này dùng game ở chế độ màn hình thông thường, với chuyển động đầu điều khiển góc nhìn trong game. Kết nối hình ảnh và kết nối theo dõi đầu là hai phần cần kiểm tra riêng.
+
+Ô **Tiếng Việt / English** ở góc trên bên phải đổi ngôn ngữ ngay, gồm nút, trạng thái, nhật ký đang hiển thị và menu cạnh đồng hồ. Lựa chọn được lưu tự động; đổi ngôn ngữ không đổi cài đặt theo dõi. Bản nâng cấp giữ tiếng Việt cho người dùng cũ; lần chạy đầu trên Windows dùng ngôn ngữ khác tiếng Việt sẽ mặc định English.
+
+| Màu nút Kết nối game | Ý nghĩa |
+|---|---|
+| Xanh lá | Game đã đăng ký kết nối và tiến trình có thành phần nhận dữ liệu còn đang chạy |
+| Đỏ | Đã bật nhưng chưa có game kết nối, hoặc không bật được kết nối |
+| Xám | Đã tắt kết nối |
+
+App kiểm tra tiến trình game khoảng mỗi giây. Màu xanh không phải xác nhận game đã sử dụng mọi lần cập nhật hướng nhìn.
+
+## Chức năng
+
+- Mô hình kính 3D trên trang chính; quay trái/phải, ngẩng/cúi, nghiêng đầu.
+- Reset góc nhìn, tạm dừng / tiếp tục; lựa chọn đảo chiều từng hướng.
+- USB tự kết nối lại khi rút và cắm dây; nút kết nối / ngắt và tìm lại USB.
+- Bấm × để chạy ngầm; mở lại từ biểu tượng cạnh đồng hồ hoặc mở app lần nữa. **Thoát hẳn** để dừng hoàn toàn.
+- Nhật ký hoạt động có thời gian, lưu cài đặt tự động.
+- Gán thêm hành động cho nút kính; mặc định bấm tăng rồi giảm âm lượng (hoặc ngược lại) trong 0,8 giây để reset.
+
+### Độ mượt và độ nhạy
+
+| Mức | Tác dụng |
+|---|---|
+| Tắt | Bỏ lớp làm mượt bổ sung |
+| Mượt nhẹ | Lọc ít hơn, phản hồi nhanh hơn |
+| Mượt vừa | Mức mặc định, dùng cách làm mượt thích nghi từ Accela của OpenTrack |
+| Mượt nhiều | Giảm rung nhiều hơn, phản hồi chậm hơn |
+
+Độ nhạy mặc định **80%**: khi đã theo kịp, quay đầu 30° tương ứng khoảng 24° gửi vào game. Mô hình biểu diễn chuyển động kính thực, không bị nhân độ nhạy của game.
+
+**Tần số gửi:** 44,4 / 50 / 80 / 100 / 140 / 200 Hz, mặc định 100 Hz. Đây là số lượt cập nhật hướng nhìn ra game mỗi giây, khác với số gói app nhận từ kính. Nhịp thực tế có thể thấp hơn khi máy bận. Reset được xử lý ngay.
+
+## FPV
+
+**Chưa hỗ trợ điều khiển camera FPV thật.** Các mức tần số đã chuẩn bị cho việc phát triển phần này, chưa có ngõ ra PPM, PWM, SBUS hoặc CRSF. Có tham khảo [HeadTracker](https://github.com/headtracker/HeadTracker) về các mức gửi; không đưa mã firmware của dự án đó vào app.
+
+## Giới hạn
+
+- Chỉ đọc ba hướng quay; ba số vị trí X/Y/Z gửi vào game luôn là 0.
+- Hướng nhìn có thể trôi; dùng F8 để đặt lại hướng giữa.
+- App không chặn chức năng gốc của nút kính. Nút độ sáng vẫn đổi độ sáng; nút âm lượng vẫn đổi âm lượng.
+- Kết nối trực tiếp dùng các thư viện tương thích đi kèm từ OpenTrack. `TrackIR.exe` là thành phần hỗ trợ nhỏ chạy ẩn, không phải app OpenTrack.
+- Chưa có bộ cài hoặc tự cập nhật. Đây là bản thử, chưa phải phần mềm điều khiển bay FPV.
+
+## Dành cho người sửa mã
+
+Xem [BUILDING.md](BUILDING.md) để chạy mã, kiểm tra và đóng gói trên Windows x64 với Python 3.12. Các gói nguồn đi kèm và cách thay thư viện được ghi tại [THIRD_PARTY.md](THIRD_PARTY.md).
+
+Nhật ký và cài đặt của bản đóng gói nằm trong `%LOCALAPPDATA%/Kariuss Max Headtracking`. Các dữ liệu này không được đưa vào kho mã. Trước khi gửi báo lỗi, hãy che thông tin cá nhân trong ảnh hoặc nhật ký.
+
+## Giấy phép và nguồn
+
+Mã Kariuss được phát hành theo **GNU GPL v3.0**; xem [LICENSE](LICENSE). Các thành phần bên thứ ba giữ giấy phép và thông tin tác giả riêng; xem [THIRD_PARTY.md](THIRD_PARTY.md) và thư mục `licenses/`.
+
+Ghi nhận: [OpenTrack](https://github.com/opentrack/opentrack), [VQF](https://github.com/dlaidig/vqf), [ar-drivers-rs](https://github.com/badicsalex/ar-drivers-rs) (tham khảo bố cục gói Rokid), [pystray](https://github.com/moses-palmer/pystray), [cython-hidapi](https://github.com/trezor/cython-hidapi).

@@ -12,14 +12,95 @@ Head tracking with **Rokid Max on Windows**, connected directly to games through
 
 Open [Releases](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases), download the **Windows x64** ZIP, extract the entire archive, and open **Kariuss Max Headtracking.exe**. Keep the `_internal` folder beside the executable. Python is not required for the packaged application.
 
-## Quick start
+For 1.8.0 with the complete wiring guide, download **[Windows x64 — Updated Guide](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releases/download/v1.8.0/Kariuss-Max-Headtracking-1.8.0-Windows-x64-Updated-Guide.zip)**. Use this package for a first-time setup.
 
-1. Connect Rokid Max to a USB port on your PC that supports data transfer.
+## Connect video and head tracking at the same time
+
+Playing through the glasses requires **video from the computer to the glasses**, **power for the glasses**, and **motion data from the glasses back to the computer**. Kariuss reads motion and sends view directions to the game. Clicking **Connect to game** does not create a video connection. With a working video connection, Windows treats the glasses as an external display.
+
+Choose a connection method by the actual port capabilities, rather than simply whether the machine is a laptop or desktop:
+
+| Available ports | Connection method |
+|---|---|
+| Laptop or desktop USB-C with video output and USB data | Connect directly using **method A** |
+| Data/charging-only USB-C, with an HDMI or DisplayPort output available | Use an adapter with **method B** |
+| Glasses connected only to a data-only USB-C port | Tracking may work on the PC's monitor, but there is no picture in the glasses |
+
+### Method A — Laptop with video-capable USB-C
+
+Check the manufacturer's specification for the **exact computer model and port**. Look for “USB-C display output”, “DisplayPort over USB-C”, or “DisplayPort Alt Mode”. A USB-C connector, charging capability, or USB speed alone does not establish video support. A desktop with the same port capabilities can also use method A. [Rokid documents direct connection through USB-C with DisplayPort](https://global.rokid.com/blogs/compatibility/which-devices-can-connect-to-rokid-max-glasses-directly).
+
+```text
+Laptop USB-C: video + USB data + power
+                    |
+        Original glasses USB-C cable
+                    |
+                 Rokid Max
+```
+
+1. Connect Rokid Max directly to the video-capable USB-C port using its original cable. A replacement cable must carry video and USB data; a charge-only cable is unsuitable.
+2. Wear the glasses and check for the Windows desktop. If it is missing, follow **Set up the display in Windows** below.
+3. Open Kariuss and check that it detects Rokid Max. Leave the glasses on a flat surface for 6 seconds, then put them on and reset the view using the **Start tracking and enter your game** steps.
+
+If the laptop's USB-C capabilities are unclear, check its specifications first. A laptop with HDMI but no USB-C video output uses method B.
+
+### Method B — Desktop graphics card, or laptop without USB-C video
+
+Use an **active HDMI → USB-C adapter in the correct direction for AR glasses**, with a separate USB connection that carries **both power and USB data** back to the PC. For DisplayPort, use a **DisplayPort → USB-C** solution with an equivalent USB data path. Common USB-C → HDMI adapters intended for connecting a laptop to a TV work in the opposite direction and do not fit this setup. [Rokid documents HDMI → USB-C for PCs with HDMI](https://global.rokid.com/blogs/compatibility/which-devices-can-be-used-with-rokid-max-glasses-via-hdmi-to-usb-c-cable).
+
+```text
+Graphics card HDMI ─── video ────────┐
+                                    ├── Adapter ── glasses USB-C cable ── Rokid Max
+PC USB ─── power + USB data ─────────┘
+```
+
+1. Connect the adapter's **HDMI input to the dedicated graphics card's HDMI output** if the PC has a dedicated card. For example, a PC using an RTX 5070 Ti takes video from the card in this diagram. The PC monitor can remain connected to another output on the card.
+2. Connect the adapter's **USB power/data input to a USB port on the same PC**, using a data-capable cable. Use USB-A or USB-C as appropriate for the adapter's input cable.
+3. Connect the adapter's **USB-C output for the glasses** to Rokid Max using the original glasses cable.
+4. Configure the Windows display, then check that Kariuss still detects the glasses and its model follows head movement.
+
+**A wall charger or power bank does not provide a data connection to the PC.** Kariuss needs a USB data path back to the computer running the app. Connecting a power port to the PC is sufficient only if the adapter and cable actually pass USB data.
+
+**Before buying an adapter, ask the seller:** “Does it pass Rokid Max USB data back to the PC for reading head-motion sensors, or is its USB input power-only?” Claims such as “supports AR glasses”, “HDMI to Type-C”, or “includes a power port” do not establish sensor-data support. A Hagibis-style adapter with HDMI input, a USB power port, and USB-C glasses output follows the port roles above; **USB sensor-data support has not been verified for every Hagibis model or revision**. A video-only adapter is insufficient for simultaneous display and Kariuss tracking. An ordinary USB-C splitter is not a substitute.
+
+### Set up the display in Windows
+
+1. Open **Settings → System → Display**. Use **Identify** to find the glasses display. If it is absent, check the cables, power, and video output capability, then try **Multiple displays → Detect**.
+2. For an easy initial test, press **Windows + P → Duplicate**. Both the PC monitor and glasses show the same content, including the game displayed on the PC monitor.
+3. To use the glasses as a separate game display, select **Extend**. Choose the glasses in the game's monitor selector if available, or run the game in a window and move it to the glasses. If it always opens on the PC monitor, you can select the glasses and enable **Make this my main display** before opening the game. An empty desktop in the glasses under Extend does not mean the connection failed: the game may be on another display.
+4. Start in **ordinary 2D display mode**, using **1920 × 1080 at 60 Hz if listed by Windows**. Select the glasses and open **Advanced display** to see available refresh rates. Higher modes require support across the glasses, cable, and adapter. **Display refresh rate is separate from Kariuss's 100 / 200 Hz output rate.**
+
+See Microsoft's [multiple-display guide](https://support.microsoft.com/en-us/windows/hardware/display-graphics/how-to-use-multiple-monitors-in-windows) and [refresh-rate settings](https://support.microsoft.com/en-us/windows/hardware/display-graphics/change-the-refresh-rate-on-your-monitor-in-windows). [Rokid lists the Max's default resolution as 1920 × 1080](https://global.rokid.com/blogs/max-2/the-resolution-of-max2-connected-to-station1-is-also-limited-to-1080-right-the-default-resolution-of-both-max2-and-max-is-1920-1080-right-when-connecting-with-station2-it-can-realize-max-1200).
+
+### Use the glasses speakers
+
+Open **Settings → System → Sound → Output** and select the glasses / HDMI audio device if Windows lists it. Depending on the connection, its name may be Rokid Max or the display / graphics-card audio device. Play some audio and check the glasses volume. Audio availability depends on the adapter and audio path, independently of motion detection. [Microsoft explains selecting a USB / HDMI audio output](https://support.microsoft.com/en-gb/windows/hardware/audio/fix-sound-or-audio-problems-in-windows?nochrome=true).
+
+### Check both parts before entering the game
+
+- **Video:** the Windows desktop or game window is visible in the glasses.
+- **Tracking:** Kariuss detects the glasses; after the 6-second calibration, the model and angles change with head movement.
+
+| Symptom | Check first |
+|---|---|
+| Kariuss detects the glasses but the glasses are dark | USB-C video capability; adapter direction; power; video-capable cable; Windows display enabled |
+| The glasses have video but Kariuss detects no glasses | Adapter USB data support; data-capable USB cable; power/data input connected back to the PC |
+| Neither video nor tracking works | All cable connections, power, and a different suitable cable or port |
+| The glasses show a desktop but no game | Duplicate / Extend mode and which display contains the game |
+| The model moves but the game does not | Enable Connect to game, close OpenTrack, check head tracking / TrackIR in the game; restart the game with Kariuss connection enabled if needed |
+
+Rokid Max tracking has been tested by the user in Flight Simulator 2024; **video and audio through the Hagibis adapter have not been physically tested in this project**. These adapter instructions describe requirements and checks, not a list of verified products.
+
+## Start tracking and enter your game
+
+1. Connect Rokid Max using method A or B above. Check video and USB data if playing through the glasses. A data-capable USB connection alone is enough to test tracking on the PC monitor.
 2. Open the app. Use the device dropdown if more than one pair of glasses is connected. Device names do not display serial numbers.
 3. **Place the glasses on a flat surface for 6 seconds to calibrate.**
 4. Put on the glasses, look straight ahead, and click **Reset view** or press **F8**.
 5. Close OpenTrack if it is running. Click **Connect to game**, open your game, and enter the cockpit.
 6. If your game does not detect tracking, leave the Kariuss game connection enabled and restart the game. Enable head tracking / TrackIR in the game's settings if it has such an option.
+
+This procedure uses the game's ordinary monitor mode, with head movement controlling the in-game view. Check the video connection and tracking connection separately.
 
 Use the **English / Tiếng Việt** dropdown in the top-right corner to change language instantly. Buttons, connection status, visible activity history, and system tray menus follow the selected language. The app remembers your choice, without changing tracking settings. Existing users upgrading from 1.7.1 keep Vietnamese. New installations default to English unless the Windows display language is Vietnamese.
 
@@ -61,9 +142,7 @@ To reset without changing brightness, use **F8** or press volume up then down (o
 
 Pausing freezes the orientation sent to the game; the model continues to show movement. Resuming uses your current direction as the new center.
 
-## Displaying video and future FPV support
-
-The app reads motion sensors. Displaying video on the glasses requires a separate video connection from the PC. A data-only USB-C port cannot provide a picture. If using an HDMI/DisplayPort-to-USB-C adapter, check that it also carries USB data back to the PC so the glasses remain detectable.
+## Future FPV support
 
 **Real FPV camera control is not implemented.** Output rate choices help prepare for future development, but there are no PPM, PWM, SBUS, or CRSF outputs. [HeadTracker](https://github.com/headtracker/HeadTracker) was consulted for rate references; its firmware code is not included in this app.
 
