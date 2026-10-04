@@ -3,6 +3,7 @@
 # See LICENSE; retained third-party notices apply to adapted portions.
 """Read-only activity console, with Vietnam/Thailand local timestamps."""
 from datetime import datetime, timedelta, timezone
+from collections import deque
 import tkinter as tk
 from tkinter import ttk
 from app_theme import BACKGROUND, TEXT, MUTED, SUCCESS, WARNING
@@ -16,9 +17,11 @@ def format_event(message, now=None):
 
 
 class EventConsole(ttk.Frame):
-    def __init__(self, parent, on_exit, log_path=None):
+    def __init__(self, parent, on_exit, log_path=None, translate=lambda text: text):
         super().__init__(parent)
         self.log_path = log_path
+        self.translate = translate
+        self.history = deque(maxlen=500)
         self.count = 0
         self.latest = ''
         toolbar = ttk.Frame(self)
@@ -42,7 +45,9 @@ class EventConsole(ttk.Frame):
         self.text.tag_configure('warning', foreground=WARNING)
 
     def append(self, message, tone='success'):
-        line = format_event(message)
+        instant = datetime.now(LOCAL_TIME)
+        self.history.append((instant, message, tone))
+        line = format_event(self.translate(message), instant)
         self.count += 1
         self.latest = line
         at_bottom = self.text.yview()[1] >= .99
@@ -62,6 +67,22 @@ class EventConsole(ttk.Frame):
                     stream.write(line+'\n')
             except OSError:
                 pass
+
+    def refresh_language(self):
+        """Translate visible history without changing timestamps or duplicating the log file."""
+        position = self.text.yview()
+        self.text.configure(state='normal')
+        self.text.delete('1.0', 'end')
+        for instant, message, tone in self.history:
+            line = format_event(self.translate(message), instant)
+            self.text.insert('end', line[:19], 'time')
+            self.text.insert('end', line[19:] + '\n', tone)
+            self.latest = line
+        self.text.configure(state='disabled')
+        if position[1] >= .99:
+            self.text.see('end')
+        else:
+            self.text.yview_moveto(position[0])
 
 
 class ConnectionEvents:

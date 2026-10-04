@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 FROZEN = bool(getattr(sys, 'frozen', False))
 APP_NAME = 'Kariuss Max Headtracking'
-APP_VERSION = '1.7.1'
+APP_VERSION = '1.8.0'
 CALIBRATION_MESSAGE = 'Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh'
 CONTROL_ROOT = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / APP_NAME
 CONTROL_ROOT.mkdir(parents=True, exist_ok=True)
@@ -351,10 +351,26 @@ class Reader:
                     pass
 
 
-def gui(resume_send=False, ui_check=False):
+def gui(resume_send=False, ui_check=False, ui_language=None):
     import tkinter as tk
     from tkinter import ttk
     import ctypes
+    import tempfile
+    from functools import partial
+    from localization import Translator, TranslatedStringVar, LANGUAGES, default_language
+    temporary_data = tempfile.TemporaryDirectory(prefix='kariuss-ui-') if ui_check else None
+    data_root = Path(temporary_data.name) if temporary_data else DATA_ROOT
+    preferences_path = data_root / 'preferences.json'
+    try:
+        preferences = json.loads(preferences_path.read_text(encoding='utf-8'))
+        if not isinstance(preferences, dict):
+            preferences = {}
+    except (OSError, ValueError, AttributeError):
+        preferences = {}
+    wanted_language = (ui_language or 'vi') if ui_check else default_language(preferences)
+    localizer = Translator()
+    tr = localizer.tr
+    StringVar = partial(TranslatedStringVar, localizer)
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('Kariuss.MaxHeadtracking')
     reader = Reader()
     reader.thread.start()
@@ -379,12 +395,18 @@ def gui(resume_send=False, ui_check=False):
     apply_dark_theme(root)
     frame = ttk.Frame(root, padding=22)
     frame.pack(fill='both', expand=True)
-    ttk.Label(frame, text='Kariuss Max Headtracking', font=('Segoe UI', 20, 'bold')).pack(anchor='w')
+    header = ttk.Frame(frame)
+    header.pack(fill='x')
+    ttk.Label(header, text=tr(APP_NAME), font=('Segoe UI', 20, 'bold')).pack(side='left')
+    language_choice = tk.StringVar(value=LANGUAGES['vi'])
+    language_box = ttk.Combobox(header, textvariable=language_choice, values=list(LANGUAGES.values()),
+                               state='readonly', width=11)
+    language_box.pack(side='right', padx=(12, 0))
     connection_row = ttk.Frame(frame)
     connection_row.pack(fill='x', pady=(12,0))
     usb_choices = {}
     selected_usb_device = None
-    usb_choice = tk.StringVar(value='Đang tìm kính…')
+    usb_choice = StringVar(value='Đang tìm kính…')
     usb_combo = ttk.Combobox(connection_row, textvariable=usb_choice, values=[], state='readonly')
     usb_combo.pack(side='left', fill='x', expand=True, padx=(0, 8))
     def toggle_connection():
@@ -392,14 +414,14 @@ def gui(resume_send=False, ui_check=False):
         reader.request_connection(enabled, selected_usb_device)
         console.append('Đang kết nối với kính' if enabled else 'Đã ngắt kết nối với kính')
         discovery.wake.set()
-    connect_button = ttk.Button(connection_row, text='Ngắt kết nối', width=13, command=toggle_connection)
+    connect_button = ttk.Button(connection_row, text=tr('Ngắt kết nối'), width=13, command=toggle_connection)
     connect_button.pack(side='left', padx=(0, 8))
     def refresh_usb():
         console.append('Đang tìm lại kết nối USB')
         discovery.wake.set()
         if reader.snapshot()['connection_enabled']:
             reader.request_connection(True, selected_usb_device)
-    ttk.Button(connection_row, text='Tìm lại USB', command=refresh_usb).pack(side='left')
+    ttk.Button(connection_row, text=tr('Tìm lại USB'), command=refresh_usb).pack(side='left')
     def change_usb(event=None):
         nonlocal selected_usb_device
         selected_usb_device = usb_choices.get(usb_choice.get())
@@ -409,32 +431,25 @@ def gui(resume_send=False, ui_check=False):
         if reader.snapshot()['connection_enabled']:
             reader.request_connection(True, selected_usb_device)
     usb_combo.bind('<<ComboboxSelected>>', change_usb)
-    usb_info = tk.StringVar(value='Đang tìm kết nối USB của kính…')
+    usb_info = StringVar(value='Đang tìm kết nối USB của kính…')
     ttk.Label(frame, textvariable=usb_info, font=('Segoe UI', 10), foreground=MUTED).pack(anchor='w', pady=(4, 8))
     tabs = ttk.Notebook(frame)
     tabs.pack(fill='both', expand=True)
     tracking = ttk.Frame(tabs, padding=14)
     controls = ttk.Frame(tabs, padding=14)
-    tabs.add(tracking, text='Theo dõi chuyển động')
-    tabs.add(controls, text='Nút trên kính')
-    status = tk.StringVar(value='Đang tìm kính…')
+    tabs.add(tracking, text=tr('Theo dõi chuyển động'))
+    tabs.add(controls, text=tr('Nút trên kính'))
+    status = StringVar(value='Đang tìm kính…')
     ttk.Label(tracking, textvariable=status, wraplength=600).pack(anchor='w', pady=(0, 10))
     from glasses_view import GlassesView
     visual_row = ttk.Frame(tracking)
     visual_row.pack(fill='x', pady=(0, 10))
-    model = GlassesView(visual_row)
+    model = GlassesView(visual_row, tr)
     model.pack(side='left', padx=(12, 28), anchor='center')
     numbers = ttk.Frame(visual_row)
     numbers.pack(side='left', fill='both', expand=True)
     labels = []
     inverse = []
-    preferences_path = DATA_ROOT / 'preferences.json'
-    try:
-        preferences = json.loads(preferences_path.read_text(encoding='utf-8'))
-        if not isinstance(preferences, dict):
-            preferences = {}
-    except (OSError, ValueError, AttributeError):
-        preferences = {}
     saved_inverse = preferences.get('inverse', [True, False, False])
     if not isinstance(saved_inverse, list) or len(saved_inverse) != 3 or not all(type(v) is bool for v in saved_inverse):
         saved_inverse = [True, False, False]
@@ -457,20 +472,20 @@ def gui(resume_send=False, ui_check=False):
     saved_sensitivity = preferences.get('motion_sensitivity', '80%')
     if saved_sensitivity not in SENSITIVITY_CHOICES:
         saved_sensitivity = '80%'
-    smoothing_choice = tk.StringVar(value=saved_smoothing)
-    sensitivity_choice = tk.StringVar(value=saved_sensitivity)
+    smoothing_choice = StringVar(value=saved_smoothing)
+    sensitivity_choice = StringVar(value=saved_sensitivity)
     motion = MotionFilter(SMOOTHING_CHOICES[saved_smoothing], int(saved_sensitivity[:-1]) / 100)
     saved_rate = preferences.get('output_frequency', '100 Hz')
     if not isinstance(saved_rate, str) or saved_rate not in RATE_CHOICES:
         saved_rate = '100 Hz'
-    rate_choice = tk.StringVar(value=saved_rate)
-    game_output = GameOutput(ROOT / 'game_clients', DATA_ROOT)
+    rate_choice = StringVar(value=saved_rate)
+    game_output = GameOutput(ROOT / 'game_clients', data_root)
     output = TrackingOutput(reader, game_output, motion, saved_inverse, RATE_CHOICES[saved_rate])
     game_presence = GamePresence()
     def save_preferences():
         preferences.update(inverse=[inv.get() for inv in inverse], button_mappings=dict(mappings),
                            motion_smoothing=smoothing_choice.get(), motion_sensitivity=sensitivity_choice.get(),
-                           output_frequency=rate_choice.get())
+                           output_frequency=rate_choice.get(), language=localizer.language)
         preferences_path.write_text(json.dumps(preferences, ensure_ascii=False, indent=2), encoding='utf-8')
     def change_inverse():
         output.configure(inverse=[inv.get() for inv in inverse])
@@ -481,13 +496,13 @@ def gui(resume_send=False, ui_check=False):
     for index, text in enumerate(('Quay trái / phải', 'Ngẩng / cúi', 'Nghiêng đầu')):
         row = ttk.Frame(numbers)
         row.pack(fill='x', pady=4)
-        ttk.Label(row, text=text, width=18).pack(anchor='w')
+        ttk.Label(row, text=tr(text), width=18).pack(anchor='w')
         value_row = ttk.Frame(row)
         value_row.pack(fill='x')
-        variable = tk.StringVar(value='0.0°')
+        variable = StringVar(value='0.0°')
         ttk.Label(value_row, textvariable=variable, font=('Segoe UI', 17, 'bold'), width=8).pack(side='left')
         inv = tk.BooleanVar(value=saved_inverse[index])
-        ttk.Checkbutton(value_row, text='Đảo chiều', variable=inv, command=change_inverse).pack(side='right')
+        ttk.Checkbutton(value_row, text=tr('Đảo chiều'), variable=inv, command=change_inverse).pack(side='right')
         labels.append(variable)
         inverse.append(inv)
     paused = False
@@ -495,7 +510,7 @@ def gui(resume_send=False, ui_check=False):
     last_output_pose = [0.0, 0.0, 0.0]
     waiting_center = None
     action_count = 0
-    last_action = tk.StringVar(value='Chưa bấm nút điều khiển.')
+    last_action = StringVar(value='Chưa bấm nút điều khiển.')
     def request_center():
         nonlocal held_pose, last_output_pose, waiting_center, action_count
         state = reader.snapshot()
@@ -519,12 +534,12 @@ def gui(resume_send=False, ui_check=False):
             request_center()
             output.pause(False)
             last_action.set('Đã tiếp tục theo dõi đầu')
-        pause_button.configure(text='Tiếp tục theo dõi đầu' if paused else 'Tạm dừng theo dõi đầu')
+        pause_button.configure(text=tr('Tiếp tục theo dõi đầu' if paused else 'Tạm dừng theo dõi đầu'))
     action_row = ttk.Frame(tracking)
     action_row.pack(fill='x', pady=(8, 7))
-    center = ttk.Button(action_row, text='Reset góc nhìn', command=request_center)
+    center = ttk.Button(action_row, text=tr('Reset góc nhìn'), command=request_center)
     center.pack(side='left', fill='x', expand=True, padx=(0, 8))
-    pause_button = ttk.Button(action_row, text='Tạm dừng theo dõi đầu', command=toggle_pause)
+    pause_button = ttk.Button(action_row, text=tr('Tạm dừng theo dõi đầu'), command=toggle_pause)
     pause_button.pack(side='right', fill='x', expand=True)
     # Keep a user's choice across launches, but don't touch the Windows game
     # registration during a layout check.
@@ -555,14 +570,14 @@ def gui(resume_send=False, ui_check=False):
     def toggle_game():
         sending.set(not sending.get())
         change_sending()
-    game_button = ttk.Button(tracking, text='Kết nối game', width=18, command=toggle_game)
+    game_button = ttk.Button(tracking, text=tr('Kết nối game'), width=18, command=toggle_game)
     game_button.pack(anchor='w', pady=8)
-    game_info = tk.StringVar(value='Chưa bật kết nối với game.')
+    game_info = StringVar(value='Chưa bật kết nối với game.')
     ttk.Label(tracking, textvariable=game_info, foreground=MUTED, wraplength=600).pack(anchor='w')
-    info = tk.StringVar()
+    info = StringVar()
     rate_row = ttk.Frame(tracking)
     rate_row.pack(fill='x', pady=(5, 0))
-    ttk.Label(rate_row, text='Tần số gửi:').pack(side='left', padx=(0, 7))
+    ttk.Label(rate_row, text=tr('Tần số gửi:')).pack(side='left', padx=(0, 7))
     rate_box = ttk.Combobox(rate_row, values=list(RATE_CHOICES), textvariable=rate_choice,
                            state='readonly', width=12)
     rate_box.pack(side='left')
@@ -574,11 +589,11 @@ def gui(resume_send=False, ui_check=False):
     rate_box.bind('<<ComboboxSelected>>', change_rate)
     feel_row = ttk.Frame(tracking)
     feel_row.pack(fill='x', pady=(7, 0))
-    ttk.Label(feel_row, text='Độ mượt:').pack(side='left', padx=(0, 7))
+    ttk.Label(feel_row, text=tr('Độ mượt:')).pack(side='left', padx=(0, 7))
     smooth_box = ttk.Combobox(feel_row, values=list(SMOOTHING_CHOICES),
                              textvariable=smoothing_choice, state='readonly', width=19)
     smooth_box.pack(side='left')
-    ttk.Label(feel_row, text='Độ nhạy:').pack(side='left', padx=(18, 7))
+    ttk.Label(feel_row, text=tr('Độ nhạy:')).pack(side='left', padx=(18, 7))
     sensitive_box = ttk.Combobox(feel_row, values=list(SENSITIVITY_CHOICES),
                                 textvariable=sensitivity_choice, state='readonly', width=8)
     sensitive_box.pack(side='left')
@@ -589,43 +604,81 @@ def gui(resume_send=False, ui_check=False):
         console.append('Đã chỉnh độ mượt: ' + smoothing_choice.get() + '; độ nhạy: ' + sensitivity_choice.get())
     smooth_box.bind('<<ComboboxSelected>>', change_feel)
     sensitive_box.bind('<<ComboboxSelected>>', change_feel)
-    ttk.Label(controls, text='Chọn thêm việc app làm khi bạn bấm nút.', wraplength=600).pack(anchor='w', pady=(0, 10))
+    ttk.Label(controls, text=tr('Chọn thêm việc app làm khi bạn bấm nút.'), wraplength=600).pack(anchor='w', pady=(0, 10))
+    action_boxes = {}
     for button in ('volume_up', 'volume_down', 'brightness'):
         row = ttk.Frame(controls)
         row.pack(fill='x', pady=5)
-        ttk.Label(row, text=BUTTON_LABELS[button], width=20).pack(side='left')
+        ttk.Label(row, text=tr(BUTTON_LABELS[button]), width=20).pack(side='left')
         combo = ttk.Combobox(row, values=list(ACTION_LABELS.values()), state='readonly', width=36)
         combo.set(ACTION_LABELS[mappings[button]])
+        action_boxes[button] = combo
         combo.pack(side='right', fill='x', expand=True)
         def changed(event, key=button, box=combo):
-            mappings[key] = next(k for k, v in ACTION_LABELS.items() if v == box.get())
+            mappings[key] = next(k for k, v in ACTION_LABELS.items() if tr(v) == box.get())
             router.reset()
             save_preferences()
-            console.append('Đã gán ' + BUTTON_LABELS[key].lower() + ': ' + box.get())
+            console.append('Đã gán ' + BUTTON_LABELS[key].lower() + ': ' + ACTION_LABELS[mappings[key]])
         combo.bind('<<ComboboxSelected>>', changed)
     ttk.Separator(controls).pack(fill='x', pady=12)
-    ttk.Label(controls, text='Hai lần bấm âm lượng ngược nhau trong 0,8 giây:', wraplength=600).pack(anchor='w')
+    ttk.Label(controls, text=tr('Hai lần bấm âm lượng ngược nhau trong 0,8 giây:'), wraplength=600).pack(anchor='w')
     pair_combo = ttk.Combobox(controls, values=list(ACTION_LABELS.values()), state='readonly')
     pair_combo.set(ACTION_LABELS[mappings['volume_pair']])
     pair_combo.pack(fill='x', pady=7)
     def change_pair(event):
-        mappings['volume_pair'] = next(k for k, v in ACTION_LABELS.items() if v == pair_combo.get())
+        mappings['volume_pair'] = next(k for k, v in ACTION_LABELS.items() if tr(v) == pair_combo.get())
         router.reset()
         save_preferences()
-        console.append('Đã gán bấm đôi âm lượng: ' + pair_combo.get())
+        console.append('Đã gán bấm đôi âm lượng: ' + ACTION_LABELS[mappings['volume_pair']])
     pair_combo.bind('<<ComboboxSelected>>', change_pair)
-    ttk.Label(controls, text='Để giữ độ sáng: dùng hai lần bấm âm lượng ở trên, hoặc F8. '
-              'Âm lượng đổi tạm rồi trở lại mức ban đầu.', wraplength=600).pack(anchor='w', pady=(4, 8))
-    ttk.Label(controls, text='App chưa chặn được chức năng gốc: nút độ sáng vẫn đổi độ sáng; '
+    ttk.Label(controls, text=tr('Để giữ độ sáng: dùng hai lần bấm âm lượng ở trên, hoặc F8. '
+              'Âm lượng đổi tạm rồi trở lại mức ban đầu.'), wraplength=600).pack(anchor='w', pady=(4, 8))
+    ttk.Label(controls, text=tr('App chưa chặn được chức năng gốc: nút độ sáng vẫn đổi độ sáng; '
               'nút âm lượng vẫn đổi âm lượng. Ở mức âm lượng cao nhất, bấm giảm rồi tăng; '
-              'ở mức thấp nhất, bấm tăng rồi giảm.', foreground=WARNING, wraplength=600).pack(anchor='w', pady=4)
-    button_info = tk.StringVar(value='Đang chờ kính…')
+              'ở mức thấp nhất, bấm tăng rồi giảm.'), foreground=WARNING, wraplength=600).pack(anchor='w', pady=4)
+    button_info = StringVar(value='Đang chờ kính…')
     ttk.Label(controls, textvariable=button_info, foreground=MUTED, wraplength=600).pack(anchor='w', pady=8)
     from event_console import EventConsole, ConnectionEvents
-    console = EventConsole(frame, lambda: close(), None if ui_check else DATA_ROOT / 'activity.log')
+    console = EventConsole(frame, lambda: close(), None if ui_check else data_root / 'activity.log', tr)
     console.pack(fill='x', pady=(10,0))
     connection_events = ConnectionEvents()
-    last_action.trace_add('write', lambda *_: console.append(last_action.get()))
+    last_action.trace_add('write', lambda *_: None if localizer.refreshing else console.append(last_action.get()))
+    # Capture static labels once; dynamic status strings keep their original values.
+    static_text = []
+    def collect_text(parent):
+        for widget in parent.winfo_children():
+            if 'text' in widget.keys() and not ('textvariable' in widget.keys() and widget.cget('textvariable')):
+                original = str(widget.cget('text'))
+                if original:
+                    static_text.append((widget, original))
+            collect_text(widget)
+    collect_text(frame)
+    def apply_language(language, log=True):
+        localizer.set_language(language)
+        language_choice.set(LANGUAGES[language])
+        for widget, original in static_text:
+            widget.configure(text=tr(original))
+        tabs.tab(tracking, text=tr('Theo dõi chuyển động'))
+        tabs.tab(controls, text=tr('Nút trên kính'))
+        smooth_box.configure(values=[tr(name) for name in SMOOTHING_CHOICES])
+        for key, box in action_boxes.items():
+            box.configure(values=[tr(name) for name in ACTION_LABELS.values()])
+            box.set(tr(ACTION_LABELS[mappings[key]]))
+        pair_combo.configure(values=[tr(name) for name in ACTION_LABELS.values()])
+        pair_combo.set(tr(ACTION_LABELS[mappings['volume_pair']]))
+        connect_button.configure(text=tr('Ngắt kết nối' if reader.snapshot()['connection_enabled'] else 'Kết nối'))
+        pause_button.configure(text=tr('Tiếp tục theo dõi đầu' if paused else 'Tạm dừng theo dõi đầu'))
+        console.refresh_language()
+        model.draw()
+        if tray is not None:
+            tray.refresh_language()
+            tray.title(APP_NAME + (' — đang chạy' if reader.snapshot()['ready'] else ' — chưa kết nối'))
+        save_preferences()
+        if log:
+            console.append('Đã đổi ngôn ngữ: ' + LANGUAGES[language])
+    language_box.bind('<<ComboboxSelected>>', lambda event: apply_language(
+        next(code for code, label in LANGUAGES.items() if label == language_choice.get())))
+    apply_language(wanted_language, log=False)
     console.append('Đã mở Kariuss Max Headtracking')
     save_preferences()
     if not ui_check and (resume_send or preferences.get('game_output_enabled') is True):
@@ -691,9 +744,9 @@ def gui(resume_send=False, ui_check=False):
             waiting_center = None
             paused = False
             held_pose = last_output_pose = [0.0, 0.0, 0.0]
-            pause_button.configure(text='Tạm dừng theo dõi đầu')
+            pause_button.configure(text=tr('Tạm dừng theo dõi đầu'))
         active = state['ready'] and state['age_s'] is not None and state['age_s'] < 0.5
-        connect_button.configure(text='Ngắt kết nối' if state['connection_enabled'] else 'Kết nối')
+        connect_button.configure(text=tr('Ngắt kết nối' if state['connection_enabled'] else 'Kết nối'))
         if now - last_scan > 1:
             if not ui_check and sending.get() and 'opentrack.exe' in process_names():
                 sending.set(False)
@@ -821,6 +874,7 @@ def gui(resume_send=False, ui_check=False):
             state['last_action'] = last_action.get()
             state['action_count'] = action_count
             state['app_version'] = APP_VERSION
+            state['language'] = localizer.language
             state['standalone_app'] = FROZEN
             state['window_hidden'] = root.state() == 'withdrawn'
             state['tray_ready'] = tray is not None and tray.ready.is_set()
@@ -829,7 +883,7 @@ def gui(resume_send=False, ui_check=False):
             state['model_angles_deg'] = list(model.pose)
             state['log_event_count'] = console.count
             state['last_log_event'] = console.latest
-            (DATA_ROOT/'last_status.json').write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
+            (data_root/'last_status.json').write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
             if tray is not None:
                 tray.title(APP_NAME + (' — đang chạy' if active else ' — chưa kết nối'))
             last_saved = now
@@ -857,7 +911,7 @@ def gui(resume_send=False, ui_check=False):
     if not ui_check:
         try:
             from tray_icon import TrayIcon
-            tray = TrayIcon(commands, icon, APP_NAME)
+            tray = TrayIcon(commands, icon, APP_NAME, tr)
             tray.start()
         except Exception as exc:
             print('Tray startup:', exc, file=sys.stderr)
@@ -906,7 +960,7 @@ def gui(resume_send=False, ui_check=False):
                 game_presence.scan = lambda: [{'pid': 123, 'name': 'FlightSimulator2024.exe'}]
                 # Actual button toggles output. Green also requires a living
                 # client, so exiting a game cannot leave a stale green button.
-                assert game_button.cget('text') == 'Kết nối game'
+                assert game_button.cget('text') == tr('Kết nối game')
                 game_button.invoke()
                 tick()
                 assert sending.get() and game_button.cget('style') == 'GameWaiting.TButton'
@@ -941,8 +995,44 @@ def gui(resume_send=False, ui_check=False):
                 change_usb()
                 assert reader.selection['path'] == b'usb-two'
                 assert 'private-id' not in console.latest
-                assert smooth_box.cget('values') == ('Tắt', 'Mượt nhẹ', 'Mượt vừa', 'Mượt nhiều')
+                assert smooth_box.cget('values') == tuple(tr(name) for name in SMOOTHING_CHOICES)
                 assert SMOOTHING_CHOICES['Mượt vừa'] == 1.5
+                # Changing display language must not change tracking or saved identifiers.
+                original_language = localizer.language
+                before_settings = ([inv.get() for inv in inverse], dict(mappings),
+                                   motion.smoothing, motion.sensitivity, rate_choice.get(),
+                                   sending.get(), paused, reader.selection['path'])
+                original_count = console.count
+                original_log = console.history[-1][0]
+                apply_language('en', log=False)
+                assert game_button.cget('text') == 'Connect to game'
+                assert center.cget('text') == 'Reset view'
+                assert smooth_box.cget('values') == ('Off', 'Light', 'Medium', 'Strong')
+                assert pair_combo.get() == 'Reset view'
+                assert tabs.tab(controls, 'text') == 'Glasses buttons'
+                assert console.count == original_count and console.history[-1][0] == original_log
+                assert 'Selected device:' in console.latest
+                smooth_box.current(2)
+                change_feel()
+                assert smoothing_choice.get() == 'Mượt vừa' and motion.smoothing == 1.5
+                action_boxes['brightness'].set('Pause / resume head tracking')
+                action_boxes['brightness'].event_generate('<<ComboboxSelected>>')
+                assert mappings['brightness'] == 'pause'
+                action_boxes['brightness'].set('Keep original function')
+                action_boxes['brightness'].event_generate('<<ComboboxSelected>>')
+                apply_language('vi', log=False)
+                assert game_button.cget('text') == 'Kết nối game'
+                assert pair_combo.get() == 'Nhìn về giữa'
+                assert smoothing_choice.get() == 'Mượt vừa'
+                # Restore the original filter configuration used by behavioral checks below.
+                motion.smoothing, motion.sensitivity = before_settings[2:4]
+                assert ([inv.get() for inv in inverse], dict(mappings), motion.smoothing,
+                        motion.sensitivity, rate_choice.get(), sending.get(), paused,
+                        reader.selection['path']) == before_settings
+                apply_language(original_language, log=False)
+                saved = json.loads(preferences_path.read_text(encoding='utf-8'))
+                assert saved['language'] == original_language
+                assert saved['motion_smoothing'] == 'Mượt vừa'
                 with reader.lock:
                     reader.ready = True
                     reader.updated = time.monotonic()
@@ -951,17 +1041,17 @@ def gui(resume_send=False, ui_check=False):
                 tick()
                 original = game_output.packets[-1]
                 pause_button.invoke()
-                assert console.latest.endswith('Đã tạm dừng theo dõi đầu trong game')
+                assert console.latest.endswith(tr('Đã tạm dừng theo dõi đầu trong game'))
                 with reader.lock:
                     reader.pose = (80.0, 40.0, 20.0)
                 tick()
                 assert game_output.packets[-1] == original  # Turning the head while paused stays frozen.
                 center.invoke()
-                assert console.latest.endswith('Đã reset góc nhìn')
+                assert console.latest.endswith(tr('Đã reset góc nhìn'))
                 tick()
                 assert game_output.packets[-1] == (0.0,) * 3
                 pause_button.invoke()
-                assert console.latest.endswith('Đã tiếp tục theo dõi đầu')
+                assert console.latest.endswith(tr('Đã tiếp tục theo dõi đầu'))
                 assert not paused and reader.center_requested.is_set()
                 with reader.lock:
                     reader.center_generation += 1
@@ -1010,6 +1100,8 @@ def gui(resume_send=False, ui_check=False):
                         pass
                     def title(self, text):
                         pass
+                    def refresh_language(self):
+                        pass
                 tray = TestTray()
                 tray.ready.set()
                 hide_window()
@@ -1029,11 +1121,13 @@ def gui(resume_send=False, ui_check=False):
                 assert len(game_output.packets) == count
                 connect_button.invoke()
                 assert reader.snapshot()['connection_enabled']
-                print('UI fits; private USB selection, smoothing labels, game button states, filtered output, reset, pause/resume, disconnect, hidden sending, and reopening passed.')
+                print('UI fits; live bilingual switching, stable settings, private USB selection, smoothing, game button states, reset, pause/resume, disconnect, hidden sending, and reopening passed.')
             finally:
                 close()
         root.after(100, check_layout)
     root.mainloop()
+    if temporary_data:
+        temporary_data.cleanup()
     if ui_errors:
         raise RuntimeError('UI check failed: ' + str(ui_errors[0]))
 
@@ -1043,6 +1137,7 @@ def main():
     parser.add_argument('--probe', type=float, default=0)
     parser.add_argument('--self-check', action='store_true')
     parser.add_argument('--ui-check', action='store_true')
+    parser.add_argument('--ui-language', choices=('vi', 'en'), help='Language for isolated UI checks')
     parser.add_argument('--resume-send', action='store_true', help='Restore active sending after an app update')
     parser.add_argument('--quit', action='store_true', help='Exit the running app, including its tray icon')
     args = parser.parse_args()
@@ -1129,7 +1224,7 @@ def main():
                 kernel.CloseHandle(mutex)
                 return
         try:
-            gui(resume_send=args.resume_send, ui_check=args.ui_check)
+            gui(resume_send=args.resume_send, ui_check=args.ui_check, ui_language=args.ui_language)
         finally:
             if mutex:
                 kernel.CloseHandle(mutex)

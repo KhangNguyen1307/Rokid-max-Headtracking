@@ -1,5 +1,7 @@
 # Thành phần và giấy phép bên thứ ba
 
+**[English](THIRD_PARTY_EN.md) · Tiếng Việt**
+
 Giấy phép GPL-3.0 của Kariuss không thay thế giấy phép riêng của những thành phần bên dưới. Các bản phát hành chứa thông báo này và thư mục `licenses/`.
 
 | Thành phần | Phiên bản / nguồn | Giấy phép và nơi ghi nhận |

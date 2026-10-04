@@ -8,19 +8,20 @@ import pystray
 
 
 class TrayIcon:
-    def __init__(self, commands, image_path, title):
+    def __init__(self, commands, image_path, title, translate=lambda text: text):
         self.commands = commands
         self.ready = threading.Event()
         self.error = None
+        self.translate = translate
         self.icon = pystray.Icon(
             'KariussMaxHeadtracking', Image.open(image_path).convert('RGBA'), title,
             menu=pystray.Menu(
-                pystray.MenuItem('Mở cửa sổ', self.command('show'), default=True),
-                pystray.MenuItem('Nhìn về giữa', self.command('center')),
-                pystray.MenuItem('Tạm dừng / tiếp tục', self.command('pause')),
-                pystray.MenuItem('Kết nối / Ngắt kết nối', self.command('connection')),
+                pystray.MenuItem(lambda item: translate('Mở cửa sổ'), self.command('show'), default=True),
+                pystray.MenuItem(lambda item: translate('Nhìn về giữa'), self.command('center')),
+                pystray.MenuItem(lambda item: translate('Tạm dừng / tiếp tục'), self.command('pause')),
+                pystray.MenuItem(lambda item: translate('Kết nối / Ngắt kết nối'), self.command('connection')),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem('Thoát hẳn', self.command('quit')),
+                pystray.MenuItem(lambda item: translate('Thoát hẳn'), self.command('quit')),
             ))
         self.thread = threading.Thread(target=self.run, daemon=True)
 
@@ -49,4 +50,8 @@ class TrayIcon:
 
     def title(self, text):
         if self.ready.is_set():
-            self.icon.title = text[:127]
+            self.icon.title = self.translate(text)[:127]
+
+    def refresh_language(self):
+        if self.ready.is_set():
+            self.icon.update_menu()

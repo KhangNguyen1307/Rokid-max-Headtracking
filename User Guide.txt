@@ -1,0 +1,57 @@
+KARIUSS MAX HEADTRACKING 1.8.0 — ENGLISH QUICK GUIDE
+
+1. Extract the entire Windows ZIP. Keep _internal beside the .exe.
+2. Open Kariuss Max Headtracking.exe. No Python or separate OpenTrack app is required.
+3. Choose English in the top-right dropdown if necessary.
+4. Connect Rokid Max using a USB connection that carries data.
+5. Place the glasses on a flat surface for 6 seconds to calibrate.
+6. Put on the glasses, look straight ahead, and click Reset view or press F8.
+7. Close OpenTrack if it is running. Click Connect to game, open the game, and enter the cockpit.
+8. If tracking is not detected, leave the Kariuss game connection enabled and restart the game.
+
+GAME BUTTON COLORS
+Green: the game has registered and a receiving component is loaded in a running process.
+Red: connection is enabled but no game is connected, or the connection failed.
+Gray: connection is disabled. Click the same button again to toggle it.
+
+ADJUSTMENTS
+Smoothing: Off / Light / Medium / Strong. Medium is the default.
+Sensitivity: 80% is the default. Reduce it if turning feels too sensitive.
+Output rate: 44.4 / 50 / 80 / 100 / 140 / 200 Hz. Default: 100 Hz.
+Invert each axis if a turn or tilt runs in the wrong direction.
+Pause freezes the game's view while the model still moves. Resume resets the center.
+
+BUTTONS ON THE GLASSES
+Choose extra actions under Glasses buttons. Settings are saved automatically.
+The glasses' original volume and brightness functions still operate.
+Use F8, or two opposite volume presses within 0.8 seconds, to reset without changing brightness.
+At maximum volume press down then up; at minimum volume press up then down.
+
+BACKGROUND AND RECONNECTION
+Unplugging and reconnecting USB is detected automatically unless you selected Disconnect.
+Allow 6 seconds to calibrate again after reconnection.
+Closing the window with X keeps tracking active in the system tray near the Windows clock.
+Double-click the glasses tray icon or launch the app again to reopen the window.
+Choose Quit app to stop completely.
+
+LANGUAGE AND LOGS
+The English / Tiếng Việt dropdown changes labels, status, visible logs, and tray menus immediately.
+Your language choice is remembered. Tracking settings are preserved.
+Activity timestamps use UTC+7: HH:mm:ss DD/MM/YYYY.
+Stored logs retain the language used when each line was recorded.
+Settings and logs are stored in %LOCALAPPDATA%/Kariuss Max Headtracking.
+
+UPDATING
+Quit the app, extract the new Windows ZIP into a new folder, and open the new executable.
+Existing user preferences are reused. There is no automatic updater.
+
+SCOPE
+Tested tracking hardware/game: Rokid Max and Microsoft Flight Simulator 2024.
+Tracks three rotations; position X/Y/Z is zero. Press F8 if the heading drifts.
+Video on the glasses needs a separate video connection; data-only USB-C provides no picture.
+An adapter must carry both video and USB data to preserve tracking.
+Real FPV camera outputs are not implemented yet.
+
+Project: https://github.com/KhangNguyen1307/Rokid-max-Headtracking
+More details: README_EN.md. Source/build instructions: BUILDING_EN.md.
+Kariuss is GPLv3. Bundled components retain their own licenses; see THIRD_PARTY_EN.md.

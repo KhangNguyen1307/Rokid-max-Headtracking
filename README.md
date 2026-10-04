@@ -1,10 +1,12 @@
 # Kariuss Max Headtracking
 
+**[English documentation](README_EN.md) · Tiếng Việt**
+
 <img src="assets/kariuss.png" alt="Kariuss Max Headtracking" width="96">
 
 Theo dõi chuyển động đầu bằng **Rokid Max trên Windows**, kết nối trực tiếp với game qua FreeTrack / TrackIR. Không cần mở ứng dụng OpenTrack riêng.
 
-**Bản thử 1.7.1.** Đã được người dùng thử với Rokid Max và Microsoft Flight Simulator 2024. Chưa xác nhận hỗ trợ các mẫu kính hoặc game khác.
+**Bản thử 1.8.0 — Tiếng Việt / English.** Đã được người dùng thử với Rokid Max và Microsoft Flight Simulator 2024. Chưa xác nhận hỗ trợ các mẫu kính hoặc game khác.
 
 ## Tải app
 
@@ -18,6 +20,8 @@ Mở [Releases](https://github.com/KhangNguyen1307/Rokid-max-Headtracking/releas
 4. Đeo kính, nhìn thẳng rồi bấm **Reset góc nhìn** hoặc **F8**.
 5. Tắt OpenTrack nếu đang mở. Bấm **Kết nối game**, mở game và vào buồng lái.
 6. Nếu game chưa nhận, giữ kết nối Kariuss đang bật rồi khởi động lại game.
+
+Ô **Tiếng Việt / English** ở góc trên bên phải đổi ngôn ngữ ngay, gồm nút, trạng thái, nhật ký đang hiển thị và menu cạnh đồng hồ. Lựa chọn được lưu tự động; đổi ngôn ngữ không đổi cài đặt theo dõi. Bản nâng cấp giữ tiếng Việt cho người dùng cũ; lần chạy đầu trên Windows dùng ngôn ngữ khác tiếng Việt sẽ mặc định English.
 
 | Màu nút Kết nối game | Ý nghĩa |
 |---|---|

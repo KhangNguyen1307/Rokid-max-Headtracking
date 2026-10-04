@@ -1,6 +1,9 @@
 KARIUSS MAX HEADTRACKING
 
-Bản 1.7.1: chọn thiết bị USB không hiện số sê-ri; các mức độ mượt dùng tên ngắn gọn.
+English instructions: User Guide.txt / README_EN.md.
+Đổi ngôn ngữ ở ô Tiếng Việt / English góc trên bên phải; lựa chọn tự lưu và giữ nguyên cài đặt theo dõi.
+
+Bản 1.8.0: thêm Tiếng Việt / English; chọn thiết bị USB không hiện số sê-ri; các mức độ mượt dùng tên ngắn gọn.
 
 Giao diện tối đồng bộ: nền, nút, thông tin USB, mô hình kính và nhật ký.
 

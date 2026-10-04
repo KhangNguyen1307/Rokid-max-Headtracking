@@ -1,16 +1,27 @@
-# v1.7.1 — bản thử đầu tiên trên GitHub
+# v1.8.0 — English / Tiếng Việt
 
-Ứng dụng Windows x64 dành cho Rokid Max: đọc chuyển động đầu và kết nối trực tiếp với game qua FreeTrack / TrackIR.
+## English
 
-- Ô chọn thiết bị không hiển thị số sê-ri.
-- Lời nhắc đặt trên mặt phẳng 6 giây khi hiệu chỉnh.
-- Nút Kết nối game có trạng thái xanh / đỏ / xám.
-- Mô hình kính 3D, reset F8, tạm dừng / tiếp tục, đảo chiều từng hướng.
-- Các mức độ mượt Tắt / Mượt nhẹ / Mượt vừa / Mượt nhiều; điều chỉnh độ nhạy và tần số gửi.
-- Tự nhận lại kính khi cắm lại USB, chạy ngầm qua biểu tượng cạnh đồng hồ, lưu cài đặt và nhật ký.
+Windows x64 head tracking for Rokid Max, with direct FreeTrack / TrackIR game output. No separate OpenTrack app is required.
 
-Đã thử với Rokid Max và Flight Simulator 2024. Chưa có ngõ ra điều khiển camera FPV hoặc xác nhận hỗ trợ kính khác.
+- New **English / Tiếng Việt** dropdown on the home screen. Switch instantly without reconnecting glasses or games.
+- Translated controls, connection/calibration status, smoothing choices, button assignments, activity history, and system tray menus.
+- Language choice is saved. Tracking settings, smoothing strength, sensitivity, output rate, and axis directions are preserved when switching.
+- New users default to English unless Windows uses Vietnamese. Existing users retain Vietnamese when upgrading.
+- English README, user guide, build instructions, and third-party license notes are included.
+- Existing USB reconnect, 3D model, F8 reset, pause/resume, background operation, and game connection behavior are retained.
 
-Tải gói Windows x64, giải nén toàn bộ, mở `Kariuss Max Headtracking.exe`. Giữ `_internal` cạnh `.exe`. Không cần cài Python hoặc mở app OpenTrack riêng.
+**Download `Kariuss-Max-Headtracking-1.8.0-Windows-x64.zip` to use the app.** Extract the entire ZIP and open `Kariuss Max Headtracking.exe`. Keep `_internal` beside the executable. To upgrade, quit the old app first; existing user settings are reused. Python is not required.
 
-Mã nguồn GPLv3; giấy phép các thành phần đi kèm giữ riêng. Gói Source chứa mã và hướng dẫn tạo lại app.
+Tracking has been tested with Rokid Max and Microsoft Flight Simulator 2024. Real FPV camera output and support for other glasses are not implemented or verified. This is a trial release. Log timestamps currently use UTC+7.
+
+Source is GPLv3; bundled components retain their own licenses. The Source ZIP includes code and rebuild instructions.
+
+## Tiếng Việt
+
+- Thêm ô **Tiếng Việt / English** ngay trên trang chính, đổi ngôn ngữ tức thì và tự lưu.
+- Dịch các nút, trạng thái, hiệu chỉnh kính, lựa chọn độ mượt / gán nút, nhật ký đang hiển thị và menu cạnh đồng hồ.
+- Đổi ngôn ngữ giữ nguyên cài đặt theo dõi, kết nối, chiều quay, độ nhạy và tần số gửi.
+- Bản nâng cấp giữ tiếng Việt cho người dùng cũ; bổ sung hướng dẫn và tài liệu mã nguồn bằng tiếng Anh.
+
+Tải gói **Windows x64**, giải nén toàn bộ rồi mở `.exe`; giữ `_internal` cạnh `.exe`. Khi nâng cấp, dùng **Thoát hẳn** trước khi mở bản mới. Không cần Python hoặc app OpenTrack riêng. Đây vẫn là bản thử; chưa có ngõ ra điều khiển camera FPV.

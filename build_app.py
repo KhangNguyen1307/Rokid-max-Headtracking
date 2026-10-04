@@ -49,7 +49,8 @@ PyInstaller.__main__.run([
 ])
 import shutil
 bundle = root / 'releases' / version / 'Kariuss Max Headtracking'
-for name in ('LICENSE', 'THIRD_PARTY.md', 'README.md', 'BUILDING.md', 'Huong dan.txt'):
+for name in ('LICENSE', 'THIRD_PARTY.md', 'THIRD_PARTY_EN.md', 'README.md', 'README_EN.md',
+             'BUILDING.md', 'BUILDING_EN.md', 'Huong dan.txt', 'User Guide.txt'):
     shutil.copy2(root / name, bundle / name)
 shutil.copytree(root / 'licenses', bundle / 'licenses', dirs_exist_ok=True)
 shutil.copytree(root / 'third_party' / 'pystray', bundle / 'third_party' / 'pystray',

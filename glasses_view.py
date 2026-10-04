@@ -87,10 +87,11 @@ def scene(pose, width, height):
 
 
 class GlassesView(tk.Canvas):
-    def __init__(self, parent):
+    def __init__(self, parent, translate=lambda text: text):
         super().__init__(parent, height=180, width=280, background=BACKGROUND,
                          highlightthickness=0, borderwidth=0)
         self.pose = (0.,0.,0.)
+        self.translate = translate
         self.active = False
         self.message = 'Chưa kết nối kính'
         self.message_color = MUTED
@@ -114,5 +115,5 @@ class GlassesView(tk.Canvas):
             self.create_line(x,center_y-3,x,center_y+3,fill=GUIDE)
         for _, points, color in scene(self.pose,width,height):
             self.create_polygon(*[v for p in points for v in p],fill=color,outline=color)
-        self.create_text(width/2,height-14,text=self.message,
+        self.create_text(width/2,height-14,text=self.translate(self.message),
                          fill=self.message_color,font=('Segoe UI',10))

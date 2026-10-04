@@ -1,5 +1,7 @@
 # Chạy và đóng gói từ mã nguồn
 
+**[English](BUILDING_EN.md) · Tiếng Việt**
+
 Môi trường đã dùng: Windows x64, Python 3.12.14, các phiên bản trong `requirements-build.txt`. Máy chỉ dùng app tải về không cần Python.
 
 ## Chuẩn bị
@@ -22,9 +24,10 @@ Mã nguồn dùng bản pystray 0.19.5 không sửa đổi trong `third_party/py
 ## Kiểm tra
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest test_game_presence test_output_scheduler test_motion_filter test_connection test_event_console
+.\.venv\Scripts\python.exe -m unittest test_localization test_game_presence test_output_scheduler test_motion_filter test_connection test_event_console
 .\.venv\Scripts\python.exe rokid_tracker.py --self-check
 .\.venv\Scripts\python.exe rokid_tracker.py --ui-check
+.\.venv\Scripts\python.exe rokid_tracker.py --ui-check --ui-language en
 ```
 
 `test_game_output` kiểm tra thư viện game thật và dùng vùng dữ liệu FreeTrack chung. Chỉ chạy khi Kariuss, OpenTrack và các game đang nhận head tracking đều đã đóng:
@@ -33,7 +36,7 @@ Mã nguồn dùng bản pystray 0.19.5 không sửa đổi trong `third_party/py
 .\.venv\Scripts\python.exe -m unittest test_game_output
 ```
 
-`--ui-check` không đăng ký kết nối game nhưng có thể đọc kính và ghi tệp trạng thái / cài đặt trong thư mục mã nguồn. Những tệp này đã được loại bằng `.gitignore`.
+`--ui-check` không đăng ký kết nối game, dùng thư mục tạm cho trạng thái / cài đặt và có thể đọc kính trong thời gian ngắn. Từ điển giao diện nằm trong `localization.py`; các giá trị lưu cho độ mượt / gán nút giữ nguyên khi đổi ngôn ngữ.
 
 ## Đóng gói
 
