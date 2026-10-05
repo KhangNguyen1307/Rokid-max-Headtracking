@@ -1,21 +1,21 @@
-# v1.8.1 — Glasses connection button / Nút kết nối kính
+# v1.9.0 — Headtracking & Mouse Control
 
 ## English
 
-- The USB button now keeps the label **Connect glasses**.
-- **Green:** connected to the glasses, including the 6-second calibration period.
-- **Red:** automatic connection is enabled, but the glasses are absent or the connection failed.
-- **Normal color:** the user has disabled the glasses connection. Click again to reconnect.
-- Unplugging the glasses returns the button to red; USB reconnection remains automatic while enabled.
+- Two mode buttons: **Headtracking (Simulator)** and **Mouse Control (FPS)**. Click either to switch directly; only the selected mode is green. The **Connect to game** button still enables/disables output.
+- Headtracking is the default at every launch. Mouse Control has separate, saved **smoothing** and **sensitivity** settings.
+- Mouse Control converts yaw/pitch changes into relative Windows mouse movement, referencing Phoenix Head Tracker's approach. Roll does not move the mouse.
+- **Reset mouse / F8** moves the cursor to the center of its current monitor. Pause, USB reconnection and mode changes discard previous mouse motion to avoid jumps.
+- Mouse movement pauses while Kariuss is in front, so its controls remain usable. Select Mouse Control, connect your glasses, click Connect to game, then switch to your game.
 
-Download the Windows x64 ZIP, extract the entire folder, and open `Kariuss Max Headtracking.exe`. Quit the previous app before upgrading. Existing preferences are retained.
+Download the Windows x64 ZIP, extract the entire folder and open `Kariuss Max Headtracking.exe`. Quit the old app before upgrading. Existing settings are retained. FPS game compatibility still needs in-game testing; centering the cursor does not guarantee centering a game's camera.
 
 ## Tiếng Việt
 
-- Nút USB luôn ghi **Kết nối kính**.
-- **Xanh lá:** đã kết nối kính, kể cả lúc hiệu chỉnh 6 giây.
-- **Đỏ:** đang bật tự kết nối nhưng chưa có kính hoặc kết nối lỗi.
-- **Màu bình thường:** bạn đã tắt kết nối kính; bấm lại để kết nối.
-- Rút kính thì nút chuyển đỏ; app vẫn tự nhận lại kính khi cắm vào.
+- Thêm **Headtracking (Simulator)** và **Mouse Control (FPS)**: bấm để chuyển trực tiếp, chỉ chế độ được chọn có màu xanh. Giữ nút **Kết nối game** để bật/tắt gửi chuyển động.
+- Mặc định mở app ở Headtracking. Mouse Control có **độ mượt** và **độ nhạy** riêng, tự lưu.
+- Tham khảo cách làm của Phoenix: quay/ngẩng/cúi đầu để di chuyển chuột; nghiêng đầu không di chuyển chuột.
+- **Reset chuột / F8** đưa con trỏ về giữa màn hình đang có chuột. Tạm dừng, cắm lại kính và đổi chế độ không dùng lại chuyển động cũ.
+- Chuột tạm dừng khi cửa sổ Kariuss ở phía trước. Chọn Mouse Control, kết nối kính, bật Kết nối game rồi chuyển sang game.
 
-Tải gói Windows x64 và giải nén toàn bộ. Dùng Thoát hẳn ở app cũ trước khi mở bản mới. Cài đặt đã lưu được giữ lại.
+Giải nén toàn bộ gói Windows x64, dùng **Thoát hẳn** ở app cũ rồi mở bản mới. Cài đặt được giữ lại. Cần thử thực tế với từng game FPS; reset con trỏ không bảo đảm reset camera trong game.

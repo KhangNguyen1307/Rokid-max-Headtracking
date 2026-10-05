@@ -36,10 +36,13 @@ class Cadence:
 
 
 class TrackingOutput:
-    def __init__(self, reader, backend, motion, inverse, frequency=100.):
+    def __init__(self, reader, backend, motion, inverse, frequency=100., *, mouse=None, mouse_motion=None):
         self.reader = reader
         self.backend = backend
         self.motion = motion
+        self.mouse = mouse
+        self.mouse_motion = mouse_motion
+        self.mode = 'headtracking'
         self.inverse = list(inverse)
         self.cadence = Cadence(frequency)
         self.lock = threading.RLock()
@@ -55,7 +58,8 @@ class TrackingOutput:
         self.error = ''
         self.sent_times = deque(maxlen=500)
 
-    def configure(self, *, frequency=None, inverse=None, smoothing=None, sensitivity=None):
+    def configure(self, *, frequency=None, inverse=None, smoothing=None, sensitivity=None,
+                  mouse_smoothing=None, mouse_sensitivity=None):
         with self.lock:
             if frequency is not None:
                 self.cadence.set_frequency(frequency)
@@ -63,35 +67,78 @@ class TrackingOutput:
             if inverse is not None:
                 self.inverse = list(inverse)
                 self.motion.reset()
+                if self.mouse_motion is not None:
+                    self.mouse_motion.reset()
+                    self.mouse.reset()
             if smoothing is not None:
                 self.motion.smoothing = smoothing
             if sensitivity is not None:
                 self.motion.sensitivity = sensitivity
+            if mouse_smoothing is not None:
+                self.mouse_motion.smoothing = mouse_smoothing
+                self.mouse_motion.reset()
+                self.mouse.reset()
+            if mouse_sensitivity is not None:
+                self.mouse.sensitivity = mouse_sensitivity
+                self.mouse.reset()
+
+    def destination(self):
+        return self.mouse if self.mode == 'mouse' else self.backend if self.mode == 'headtracking' else None
+
+    def set_mode(self, mode):
+        if mode not in ('headtracking', 'mouse', None) or (mode == 'mouse' and self.mouse is None):
+            raise ValueError('Unsupported tracking mode')
+        with self.lock:
+            was_enabled = self.enabled
+            self.set_enabled(False)
+            self.mode = mode
+            self.pose = self.held = [0., 0., 0.]
+            self.paused = False
+            self.waiting_center = None
+            self.motion.reset()
+            if self.mouse_motion is not None:
+                self.mouse_motion.reset()
+                self.mouse.reset()
+            if was_enabled and mode is not None:
+                self.set_enabled(True)
 
     def set_enabled(self, enabled):
         with self.lock:
             self.enabled = False
             if enabled:
                 self.error = ''
-                self.backend.start()
+                destination = self.destination()
+                if destination is None:
+                    raise ValueError('Chọn chế độ trước khi kết nối game.')
+                destination.start()
                 self.cadence.deadline = None
                 self.sent_times.clear()
                 self.enabled = True
             else:
                 self.backend.stop()
+                if self.mouse is not None:
+                    self.mouse.stop()
 
     def center(self, generation):
         with self.lock:
             self.waiting_center = generation
             self.pose = self.held = [0.,0.,0.]
             self.motion.reset((0.,0.,0.))
+            if self.mode == 'mouse':
+                self.mouse_motion.reset((0.,0.,0.))
+                self.mouse.center()
+                return
             # Reset is a control action; it must not wait for a low-rate slot.
             if self.enabled:
                 self.write(time.perf_counter())
 
     def write(self, now):
         try:
-            written = self.backend.update(self.pose, active=self.active)
+            destination = self.destination()
+            if destination is None:
+                return False
+            written = destination.update(self.pose, active=self.active and
+                                         (self.mode != 'mouse' or not self.paused))
             if written:
                 self.sent_times.append(now)
             return bool(written)
@@ -99,7 +146,7 @@ class TrackingOutput:
             self.error = str(exc)
             self.enabled = False
             try:
-                self.backend.stop()
+                self.set_enabled(False)
             except Exception as cleanup:
                 self.error += '; ' + str(cleanup)
             return False
@@ -109,6 +156,10 @@ class TrackingOutput:
             if paused:
                 self.held = list(self.pose)
             self.paused = paused
+            if self.mouse is not None:
+                self.mouse.reset()
+                if not paused:
+                    self.mouse_motion.reset()
             return list(self.held)
 
     def step(self, state, now, *, force=False):
@@ -118,6 +169,9 @@ class TrackingOutput:
             if state['connection_session'] != self.session:
                 self.session = state['connection_session']
                 self.motion.reset()
+                if self.mouse_motion is not None:
+                    self.mouse_motion.reset()
+                    self.mouse.reset()
                 self.waiting_center = None
                 self.paused = False
                 self.held = [0.,0.,0.]
@@ -125,16 +179,24 @@ class TrackingOutput:
             if self.waiting_center is not None and state['center_generation'] > self.waiting_center:
                 self.waiting_center = None
                 self.motion.reset((0.,0.,0.))
+                if self.mouse_motion is not None:
+                    self.mouse_motion.reset((0.,0.,0.))
+                    self.mouse.reset()
             raw = [a * (-1 if inv else 1) for a,inv in zip(state['angles_deg'], self.inverse)]
+            if self.mode == 'mouse':
+                raw[2] = 0.  # Tilting must not change the mouse smoothing response.
             if self.paused:
                 self.pose = list(self.held)
             elif self.waiting_center is not None:
                 self.pose = [0.,0.,0.]
             elif self.active:
-                self.pose = self.motion.apply(raw, now)
+                selected_filter = self.mouse_motion if self.mode == 'mouse' else self.motion
+                self.pose = selected_filter.apply(raw, now)
             else:
                 self.pose = [0.,0.,0.]
                 self.motion.reset()
+                if self.mouse_motion is not None:
+                    self.mouse_motion.reset()
             if not self.enabled:
                 return False
             return self.write(now)
@@ -144,8 +206,10 @@ class TrackingOutput:
             times = self.sent_times
             measured = ((len(times)-1)/(times[-1]-times[0])
                         if len(times)>1 and times[-1]>times[0] else 0.)
-            return {'game_output': self.backend.snapshot(), 'output_angles_deg': list(self.pose),
-                    'sending_to_game': self.enabled and self.active,
+            return {'game_output': self.backend.snapshot(),
+                    'mouse_output': self.mouse.snapshot() if self.mouse is not None else {},
+                    'output_mode': self.mode, 'output_angles_deg': list(self.pose),
+                    'sending_to_game': self.enabled and self.active and self.mode is not None,
                     'paused': self.paused, 'error': self.error,
                     'target_hz': self.cadence.frequency, 'measured_hz': round(measured,1)}
 
@@ -160,7 +224,7 @@ class TrackingOutput:
                     self.error = str(exc)
                     self.enabled = False
                     try:
-                        self.backend.stop()
+                        self.set_enabled(False)
                     except Exception as cleanup:
                         self.error += '; ' + str(cleanup)
             with self.lock:
@@ -175,5 +239,4 @@ class TrackingOutput:
         if self.thread.is_alive():
             self.thread.join(timeout=1)
         with self.lock:
-            self.enabled = False
-            self.backend.stop()
+            self.set_enabled(False)

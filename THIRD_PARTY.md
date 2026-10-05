@@ -22,5 +22,7 @@ Mã nguồn Kariuss, hướng dẫn đóng gói và pystray đi kèm cho phép t
 
 Bố cục gói dữ liệu Rokid được tham khảo từ https://github.com/badicsalex/ar-drivers-rs/blob/master/src/rokid.rs. Cách hợp nhất chuyển động dùng thư viện VQF; không chép mã firmware HeadTracker vào app. Các mức gửi FPV được tham khảo từ https://github.com/headtracker/HeadTracker.
 
+Mouse Control tham khảo cách chuyển phần thay đổi góc quay thành chuyển động chuột của [PhoenixHeadTracker](https://github.com/iVideoGameBoss/PhoenixHeadTracker/blob/main/PhoenixHeadTracker/Form1.cs), dự án GPL-3.0 của iVideoGameBoss. Kariuss triển khai riêng trong `mouse_output.py`, dùng SendInput của Windows và bộ làm mượt riêng.
+
 Kariuss là dự án cộng đồng, không khẳng định được Rokid, OpenTrack hoặc Microsoft chứng nhận.
 

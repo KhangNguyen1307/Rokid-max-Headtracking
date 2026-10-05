@@ -22,4 +22,6 @@ Kariuss source, build instructions, and the bundled pystray source allow rebuild
 
 The Rokid packet layout was referenced from https://github.com/badicsalex/ar-drivers-rs/blob/master/src/rokid.rs. Motion fusion uses VQF. No HeadTracker firmware code is included; FPV output rates were referenced from https://github.com/headtracker/HeadTracker.
 
+Mouse Control references the angle-change-to-mouse approach in [PhoenixHeadTracker](https://github.com/iVideoGameBoss/PhoenixHeadTracker/blob/main/PhoenixHeadTracker/Form1.cs), a GPL-3.0 project by iVideoGameBoss. Kariuss implements it independently in `mouse_output.py`, using Windows SendInput and separate smoothing settings.
+
 Kariuss is a community project and does not claim certification or endorsement by Rokid, OpenTrack, or Microsoft.
