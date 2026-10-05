@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 FROZEN = bool(getattr(sys, 'frozen', False))
 APP_NAME = 'Kariuss Max Headtracking'
-APP_VERSION = '1.8.0'
+APP_VERSION = '1.8.1'
 CALIBRATION_MESSAGE = 'Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh'
 CONTROL_ROOT = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / APP_NAME
 CONTROL_ROOT.mkdir(parents=True, exist_ok=True)
@@ -214,7 +214,7 @@ class Reader:
             self.connection_revision += 1
             self.reset_connection()
             self.error = None
-            self.status = 'Đang kết nối với kính…' if enabled else 'Đã ngắt kết nối. Bấm Kết nối để dùng lại.'
+            self.status = 'Đang kết nối với kính…' if enabled else 'Đã ngắt kết nối. Bấm Kết nối kính để dùng lại.'
         self.wake.set()
 
     def current_connection(self, revision):
@@ -412,10 +412,17 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     def toggle_connection():
         enabled = not reader.snapshot()['connection_enabled']
         reader.request_connection(enabled, selected_usb_device)
+        refresh_connection_button(reader.snapshot())
         console.append('Đang kết nối với kính' if enabled else 'Đã ngắt kết nối với kính')
         discovery.wake.set()
-    connect_button = ttk.Button(connection_row, text=tr('Ngắt kết nối'), width=13, command=toggle_connection)
+    connect_button = ttk.Button(connection_row, text=tr('Kết nối kính'), width=16, command=toggle_connection)
     connect_button.pack(side='left', padx=(0, 8))
+    def refresh_connection_button(state):
+        connection = ('off' if not state['connection_enabled'] else
+                      'connected' if state['connected'] and not state['error'] else 'waiting')
+        connect_button.configure(style={'off': 'TButton', 'connected': 'GameConnected.TButton',
+                                        'waiting': 'GameWaiting.TButton'}[connection])
+        return connection
     def refresh_usb():
         console.append('Đang tìm lại kết nối USB')
         discovery.wake.set()
@@ -666,7 +673,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             box.set(tr(ACTION_LABELS[mappings[key]]))
         pair_combo.configure(values=[tr(name) for name in ACTION_LABELS.values()])
         pair_combo.set(tr(ACTION_LABELS[mappings['volume_pair']]))
-        connect_button.configure(text=tr('Ngắt kết nối' if reader.snapshot()['connection_enabled'] else 'Kết nối'))
+        connect_button.configure(text=tr('Kết nối kính'))
+        refresh_connection_button(reader.snapshot())
         pause_button.configure(text=tr('Tiếp tục theo dõi đầu' if paused else 'Tạm dừng theo dõi đầu'))
         console.refresh_language()
         model.draw()
@@ -746,7 +754,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             held_pose = last_output_pose = [0.0, 0.0, 0.0]
             pause_button.configure(text=tr('Tạm dừng theo dõi đầu'))
         active = state['ready'] and state['age_s'] is not None and state['age_s'] < 0.5
-        connect_button.configure(text=tr('Ngắt kết nối' if state['connection_enabled'] else 'Kết nối'))
+        glasses_connection = refresh_connection_button(state)
         if now - last_scan > 1:
             if not ui_check and sending.get() and 'opentrack.exe' in process_names():
                 sending.set(False)
@@ -861,6 +869,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             state['game_connected'] = game_connected
             state['game_client_processes'] = game_connection['clients']
             state['game_button_state'] = 'connected' if game_connected else 'waiting' if sending.get() or output_error else 'off'
+            state['glasses_button_state'] = glasses_connection
             state['inverse'] = [inv.get() for inv in inverse]
             state['button_mappings'] = dict(mappings)
             state['paused'] = paused
@@ -940,6 +949,30 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 motion.sensitivity = 1.
                 reader.stop.set()
                 reader.thread.join(timeout=1)
+                # Auto-detection is enabled initially, but no open USB connection
+                # must show red. Green includes the six-second calibration period.
+                reader.request_connection(True)
+                tick()
+                assert connect_button.cget('text') == tr('Kết nối kính')
+                assert connect_button.cget('style') == 'GameWaiting.TButton'
+                with reader.lock:
+                    reader.connected = True
+                    reader.ready = False
+                    reader.error = None
+                    reader.status = CALIBRATION_MESSAGE
+                tick()
+                assert connect_button.cget('style') == 'GameConnected.TButton'
+                assert status.get() == CALIBRATION_MESSAGE
+                with reader.lock:
+                    reader.reset_connection()  # A removed cable must immediately lose green.
+                tick()
+                assert connect_button.cget('style') == 'GameWaiting.TButton'
+                connect_button.invoke()
+                assert not reader.snapshot()['connection_enabled']
+                assert connect_button.cget('style') == 'TButton'
+                connect_button.invoke()
+                assert reader.snapshot()['connection_enabled']
+                assert connect_button.cget('style') == 'GameWaiting.TButton'
                 game_output.stop()
                 class CaptureGameOutput:
                     enabled = True
@@ -1005,6 +1038,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 original_count = console.count
                 original_log = console.history[-1][0]
                 apply_language('en', log=False)
+                assert connect_button.cget('text') == 'Connect glasses'
+                assert connect_button.cget('style') == 'GameWaiting.TButton'
                 assert game_button.cget('text') == 'Connect to game'
                 assert center.cget('text') == 'Reset view'
                 assert smooth_box.cget('values') == ('Off', 'Light', 'Medium', 'Strong')
@@ -1021,6 +1056,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 action_boxes['brightness'].set('Keep original function')
                 action_boxes['brightness'].event_generate('<<ComboboxSelected>>')
                 apply_language('vi', log=False)
+                assert connect_button.cget('text') == 'Kết nối kính'
                 assert game_button.cget('text') == 'Kết nối game'
                 assert pair_combo.get() == 'Nhìn về giữa'
                 assert smoothing_choice.get() == 'Mượt vừa'
@@ -1116,12 +1152,14 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 root.withdraw()
                 connect_button.invoke()
                 assert not reader.snapshot()['connection_enabled']
+                assert connect_button.cget('style') == 'TButton'
                 count = len(game_output.packets)
                 tick()
                 assert len(game_output.packets) == count
                 connect_button.invoke()
                 assert reader.snapshot()['connection_enabled']
-                print('UI fits; live bilingual switching, stable settings, private USB selection, smoothing, game button states, reset, pause/resume, disconnect, hidden sending, and reopening passed.')
+                assert connect_button.cget('style') == 'GameWaiting.TButton'
+                print('UI fits; glasses button red/green/off, calibration and unplug states, bilingual labels, game states, reset, pause/resume, and background operation passed.')
             finally:
                 close()
         root.after(100, check_layout)
