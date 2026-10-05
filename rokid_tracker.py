@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 FROZEN = bool(getattr(sys, 'frozen', False))
 APP_NAME = 'Kariuss Max Headtracking'
-APP_VERSION = '1.9.0'
+APP_VERSION = '1.10.5'
 CALIBRATION_MESSAGE = 'Đặt trên mặt phẳng 6 giây để kính hiệu chỉnh'
 CONTROL_ROOT = Path(os.environ.get('LOCALAPPDATA', str(Path.home()))) / APP_NAME
 CONTROL_ROOT.mkdir(parents=True, exist_ok=True)
@@ -380,12 +380,12 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     tray = None
     stopping = False
     root = tk.Tk()
-    root.title(APP_NAME)
+    root.title(f'{APP_NAME} · v{APP_VERSION}')
     icon = ROOT / 'assets' / 'kariuss.ico'
     if icon.exists():
         root.iconbitmap(str(icon))
-    root.geometry('800x840')
-    root.minsize(780, 820)
+    root.geometry('800x880')
+    root.minsize(780, 880)
     if ui_check:
         root.withdraw()
     ui_errors = []
@@ -402,6 +402,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     header = ttk.Frame(frame)
     header.pack(fill='x')
     ttk.Label(header, text=tr(APP_NAME), font=('Segoe UI', 20, 'bold')).pack(side='left')
+    ttk.Label(header, text=f'v{APP_VERSION}', font=('Segoe UI', 10),
+              foreground=MUTED).pack(side='left', padx=(10, 0), pady=(9, 0))
     language_choice = tk.StringVar(value=LANGUAGES['vi'])
     language_box = ttk.Combobox(header, textvariable=language_choice, values=list(LANGUAGES.values()),
                                state='readonly', width=11)
@@ -424,7 +426,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     def refresh_connection_button(state):
         connection = ('off' if not state['connection_enabled'] else
                       'connected' if state['connected'] and not state['error'] else 'waiting')
-        connect_button.configure(style={'off': 'TButton', 'connected': 'GameConnected.TButton',
+        connect_button.configure(text=tr('Ngắt kết nối' if connection == 'connected' else 'Kết nối kính'),
+                                 style={'off': 'TButton', 'connected': 'GameConnected.TButton',
                                         'waiting': 'GameWaiting.TButton'}[connection])
         return connection
     def refresh_usb():
@@ -448,8 +451,10 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     tabs.pack(fill='both', expand=True)
     tracking = ttk.Frame(tabs, padding=14)
     controls = ttk.Frame(tabs, padding=14)
+    mouse_settings = ttk.Frame(tabs, padding=14)
     tabs.add(tracking, text=tr('Theo dõi chuyển động'))
     tabs.add(controls, text=tr('Nút trên kính'))
+    tabs.add(mouse_settings, text=tr('Điều khiển chuột'))
     status = StringVar(value='Đang tìm kính…')
     ttk.Label(tracking, textvariable=status, wraplength=600).pack(anchor='w', pady=(0, 10))
     from glasses_view import GlassesView
@@ -475,7 +480,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     from game_output import GameOutput, process_names
     from game_presence import GamePresence
     from output_scheduler import TrackingOutput, RATE_CHOICES
-    from mouse_output import MouseOutput, MOUSE_SENSITIVITY_CHOICES
+    from mouse_output import (MouseOutput, MOUSE_SENSITIVITY_CHOICES, MOUSE_STYLES,
+                              CLUTCH_KEYS, TURN_SPEEDS, DEADZONE_CHOICES, TURN_ANGLE_CHOICES)
     saved_smoothing = preferences.get('motion_smoothing', 'Mượt vừa')
     if isinstance(saved_smoothing, str):
         saved_smoothing = SMOOTHING_ALIASES.get(saved_smoothing, saved_smoothing)
@@ -509,6 +515,23 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             return (960, 540)
     mouse_output = MouseOutput(CheckMouse() if ui_check else None,
                                int(saved_mouse_sensitivity[:-1]) / 100)
+    def saved_mouse_option(key, choices, default):
+        value = preferences.get(key, default)
+        return value if isinstance(value, str) and value in choices else default
+    mouse_style_choice = StringVar(value=saved_mouse_option('mouse_style', MOUSE_STYLES,
+                                                          'Giữ phím để đưa đầu về giữa'))
+    clutch_key_choice = StringVar(value=saved_mouse_option('mouse_clutch_key', CLUTCH_KEYS, 'F6'))
+    mouse_deadzone_choice = tk.StringVar(value=saved_mouse_option('mouse_deadzone', DEADZONE_CHOICES, '6°'))
+    mouse_turn_angle_choice = tk.StringVar(value=saved_mouse_option('mouse_turn_angle', TURN_ANGLE_CHOICES, '30°'))
+    mouse_turn_speed_choice = StringVar(value=saved_mouse_option('mouse_turn_speed', TURN_SPEEDS, 'Bình thường'))
+    mouse_vertical_choice = tk.BooleanVar(value=preferences.get('mouse_continuous_vertical') is True)
+    def mouse_control_settings():
+        return dict(style=MOUSE_STYLES[mouse_style_choice.get()], clutch_key=CLUTCH_KEYS[clutch_key_choice.get()],
+                    deadzone=float(mouse_deadzone_choice.get()[:-1]),
+                    turn_angle=float(mouse_turn_angle_choice.get()[:-1]),
+                    turn_speed=TURN_SPEEDS[mouse_turn_speed_choice.get()],
+                    continuous_vertical=mouse_vertical_choice.get())
+    mouse_output.configure(**mouse_control_settings())
     saved_rate = preferences.get('output_frequency', '100 Hz')
     if not isinstance(saved_rate, str) or saved_rate not in RATE_CHOICES:
         saved_rate = '100 Hz'
@@ -526,6 +549,9 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
         preferences.update(inverse=[inv.get() for inv in inverse], button_mappings=dict(mappings),
                            motion_smoothing=smoothing_choice.get(), motion_sensitivity=sensitivity_choice.get(),
                            mouse_smoothing=mouse_smoothing_choice.get(), mouse_sensitivity=mouse_sensitivity_choice.get(),
+                           mouse_style=mouse_style_choice.get(), mouse_clutch_key=clutch_key_choice.get(),
+                           mouse_deadzone=mouse_deadzone_choice.get(), mouse_turn_angle=mouse_turn_angle_choice.get(),
+                           mouse_turn_speed=mouse_turn_speed_choice.get(), mouse_continuous_vertical=mouse_vertical_choice.get(),
                            output_mode=output_mode.get(),
                            output_frequency=rate_choice.get(), language=localizer.language)
         preferences_path.write_text(json.dumps(preferences, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -553,10 +579,33 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     waiting_center = None
     action_count = 0
     last_action = StringVar(value='Chưa bấm nút điều khiển.')
+    def request_mouse_center():
+        nonlocal action_count, waiting_center, held_pose, last_output_pose
+        try:
+            with output.lock:
+                state = reader.snapshot()
+                ready = state['ready'] and state['age_s'] is not None and state['age_s'] < .5
+                generation = state['center_generation'] if ready else None
+                output.center_mouse(generation)
+                if ready:
+                    waiting_center = generation
+                    held_pose = last_output_pose = [0., 0., 0.]
+                    if output_mode.get() == 'headtracking':
+                        output.center(generation)
+                    reader.center_requested.set()
+        except Exception as exc:
+            last_action.set('Không reset được chuột: ' + str(exc))
+            return
+        action_count += 1
+        last_action.set('Đã đưa chuột về giữa màn hình và đặt lại hướng đầu' if ready else
+                        'Đã đưa chuột về giữa màn hình')
     def request_center():
         nonlocal held_pose, last_output_pose, waiting_center, action_count
+        if output_mode.get() == 'mouse':
+            request_mouse_center()
+            return
         state = reader.snapshot()
-        if output_mode.get() != 'mouse' and (not state['ready'] or state['age_s'] is None or state['age_s'] >= 0.5):
+        if not state['ready'] or state['age_s'] is None or state['age_s'] >= 0.5:
             last_action.set('Kính chưa sẵn sàng. Chờ nhận chuyển động rồi thử lại.')
             return
         waiting_center = state['center_generation']
@@ -568,7 +617,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             return
         reader.center_requested.set()
         action_count += 1
-        last_action.set('Đã đưa chuột về giữa màn hình' if output_mode.get() == 'mouse' else 'Đã reset góc nhìn')
+        last_action.set('Đã reset góc nhìn')
     def toggle_pause():
         nonlocal paused, held_pose, action_count
         paused = not paused
@@ -622,6 +671,12 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     head_mode_button.pack(side='left', fill='x', expand=True, padx=(0, 8))
     mouse_mode_button = ttk.Button(mode_row, text='Mouse Control (FPS)', command=lambda: select_mode('mouse'))
     mouse_mode_button.pack(side='left', fill='x', expand=True)
+    def refresh_output_button():
+        if output_mode.get() == 'mouse':
+            caption = 'Dừng điều khiển chuột' if sending.get() else 'Bấm để bắt đầu điều khiển chuột'
+            game_button.configure(text=tr(caption), width=0)
+        else:
+            game_button.configure(text=tr('Kết nối game'), width=18)
     def change_sending():
         nonlocal output_error, observed_game_id
         output_error = ''
@@ -633,7 +688,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             else:
                 output.set_enabled(False)
                 observed_game_id = 0
-                console.append('Đã tắt kết nối với game')
+                console.append('Đã dừng điều khiển chuột' if output_mode.get() == 'mouse' else 'Đã tắt kết nối với game')
         except Exception as exc:
             sending.set(False)
             output_error = str(exc)
@@ -642,6 +697,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             preferences['game_output_enabled'] = sending.get()
             save_preferences()
         game_presence.request(sending.get() and output_mode.get() == 'headtracking', 0)
+        refresh_output_button()
         game_button.configure(style='GameWaiting.TButton' if sending.get() or output_error else 'TButton')
     def toggle_game():
         sending.set(not sending.get())
@@ -675,15 +731,19 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     sensitive_box = ttk.Combobox(feel_row, values=list(SENSITIVITY_CHOICES),
                                 textvariable=sensitivity_choice, state='readonly', width=8)
     sensitive_box.pack(side='left')
+    mouse_settings_link = ttk.Button(tracking, text=tr('Chỉnh trong tab Điều khiển chuột'),
+                                    command=lambda: tabs.select(mouse_settings))
     def refresh_mode_controls():
         is_mouse = output_mode.get() == 'mouse'
+        refresh_output_button()
         head_mode_button.configure(style='TButton' if is_mouse else 'GameConnected.TButton')
         mouse_mode_button.configure(style='GameConnected.TButton' if is_mouse else 'TButton')
-        feel_smoothing_label.configure(text=tr('Độ mượt chuột:' if is_mouse else 'Độ mượt:'))
-        feel_sensitivity_label.configure(text=tr('Độ nhạy chuột:' if is_mouse else 'Độ nhạy:'))
-        smooth_box.configure(textvariable=mouse_smoothing_choice if is_mouse else smoothing_choice)
-        sensitive_box.configure(textvariable=mouse_sensitivity_choice if is_mouse else sensitivity_choice,
-                                 values=MOUSE_SENSITIVITY_CHOICES if is_mouse else SENSITIVITY_CHOICES)
+        if is_mouse:
+            feel_row.pack_forget()
+            mouse_settings_link.pack(anchor='w', pady=(7, 0))
+        else:
+            mouse_settings_link.pack_forget()
+            feel_row.pack(fill='x', pady=(7, 0))
         center.configure(text=tr('Reset chuột' if is_mouse else 'Reset góc nhìn'))
         state = reader.snapshot()
         ready = state['ready'] and state['age_s'] is not None and state['age_s'] < .5
@@ -691,18 +751,94 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
         pause_button.configure(text=tr(('Tiếp tục điều khiển chuột' if paused else 'Tạm dừng điều khiển chuột')
                                       if is_mouse else ('Tiếp tục theo dõi đầu' if paused else 'Tạm dừng theo dõi đầu')))
     def change_feel(event=None):
-        if output_mode.get() == 'mouse':
-            output.configure(mouse_smoothing=SMOOTHING_CHOICES[mouse_smoothing_choice.get()],
-                             mouse_sensitivity=int(mouse_sensitivity_choice.get()[:-1]) / 100)
-            message = 'Đã chỉnh độ mượt chuột: ' + mouse_smoothing_choice.get() + '; độ nhạy: ' + mouse_sensitivity_choice.get()
-        else:
-            output.configure(smoothing=SMOOTHING_CHOICES[smoothing_choice.get()],
-                             sensitivity=int(sensitivity_choice.get()[:-1]) / 100)
-            message = 'Đã chỉnh độ mượt: ' + smoothing_choice.get() + '; độ nhạy: ' + sensitivity_choice.get()
+        output.configure(smoothing=SMOOTHING_CHOICES[smoothing_choice.get()],
+                         sensitivity=int(sensitivity_choice.get()[:-1]) / 100)
+        message = 'Đã chỉnh độ mượt: ' + smoothing_choice.get() + '; độ nhạy: ' + sensitivity_choice.get()
         save_preferences()
         console.append(message)
     smooth_box.bind('<<ComboboxSelected>>', change_feel)
     sensitive_box.bind('<<ComboboxSelected>>', change_feel)
+    mouse_style_row = ttk.Frame(mouse_settings)
+    mouse_style_row.pack(fill='x', pady=(0, 8))
+    ttk.Label(mouse_style_row, text=tr('Kiểu điều khiển:')).pack(side='left', padx=(0, 8))
+    mouse_style_box = ttk.Combobox(mouse_style_row, values=list(MOUSE_STYLES), textvariable=mouse_style_choice,
+                                  state='readonly')
+    mouse_style_box.pack(side='left', fill='x', expand=True)
+    mouse_style_help = StringVar()
+    ttk.Label(mouse_settings, textvariable=mouse_style_help, wraplength=660).pack(anchor='w', pady=(0, 10))
+    mouse_feel_row = ttk.Frame(mouse_settings)
+    mouse_feel_row.pack(fill='x', pady=(0, 10))
+    ttk.Label(mouse_feel_row, text=tr('Độ mượt chuột:')).pack(side='left', padx=(0, 7))
+    mouse_smooth_box = ttk.Combobox(mouse_feel_row, values=list(SMOOTHING_CHOICES),
+                                  textvariable=mouse_smoothing_choice, state='readonly', width=13)
+    mouse_smooth_box.pack(side='left')
+    ttk.Label(mouse_feel_row, text=tr('Độ nhạy chuột:')).pack(side='left', padx=(14, 7))
+    mouse_sensitive_box = ttk.Combobox(mouse_feel_row, values=MOUSE_SENSITIVITY_CHOICES,
+                                     textvariable=mouse_sensitivity_choice, state='readonly', width=8)
+    mouse_sensitive_box.pack(side='left')
+    clutch_row = ttk.Frame(mouse_settings)
+    clutch_row.pack(fill='x', pady=(0, 7))
+    ttk.Label(clutch_row, text=tr('Giữ để đưa đầu về giữa:')).pack(side='left', padx=(0, 10))
+    clutch_key_box = ttk.Combobox(clutch_row, values=list(CLUTCH_KEYS), textvariable=clutch_key_choice,
+                                 state='readonly', width=24)
+    clutch_key_box.pack(side='left')
+    ttk.Label(mouse_settings, text=tr('Chọn phím chưa dùng trong game; app không chặn chức năng gốc của phím.'),
+              font=('Segoe UI', 9), wraplength=660, foreground=MUTED).pack(anchor='w', pady=(0, 8))
+    turn_controls = ttk.LabelFrame(mouse_settings, text=tr('Quay liên tục'), padding=10)
+    turn_controls.pack(fill='x', pady=(0, 10))
+    turn_boxes = []
+    for text, variable, values in (
+            ('Bắt đầu quay khi lệch hơn:', mouse_deadzone_choice, DEADZONE_CHOICES),
+            ('Đạt tốc độ cao nhất ở:', mouse_turn_angle_choice, TURN_ANGLE_CHOICES),
+            ('Tốc độ quay tối đa:', mouse_turn_speed_choice, list(TURN_SPEEDS))):
+        row = ttk.Frame(turn_controls)
+        row.pack(fill='x', pady=3)
+        ttk.Label(row, text=tr(text), width=30).pack(side='left')
+        box = ttk.Combobox(row, values=values, textvariable=variable, state='readonly', width=15)
+        box.pack(side='left')
+        turn_boxes.append(box)
+    turn_vertical_check = ttk.Checkbutton(turn_controls, text=tr('Ngẩng / cúi cũng quay liên tục'),
+                                         variable=mouse_vertical_choice)
+    turn_vertical_check.pack(anchor='w', pady=(5, 0))
+    ttk.Label(mouse_settings, text=tr('Reset chuột hoặc F8 trong Mouse Control: đưa con trỏ về giữa, đặt lại hướng kính và các góc về 0.'),
+              wraplength=660, foreground=MUTED).pack(anchor='w', pady=(0, 8))
+    def start_mouse_from_tab():
+        if output_mode.get() != 'mouse' and sending.get():
+            sending.set(False)
+            change_sending()
+        select_mode('mouse')
+        toggle_game()
+    mouse_tab_actions = ttk.Frame(mouse_settings)
+    mouse_tab_actions.pack(fill='x', pady=(0, 5))
+    mouse_start_button = ttk.Button(mouse_tab_actions, text=tr('Bấm để bắt đầu điều khiển chuột'), command=start_mouse_from_tab)
+    mouse_start_button.pack(side='left', padx=(0, 8))
+    mouse_reset_button = ttk.Button(mouse_tab_actions, text=tr('Reset chuột'), command=request_mouse_center)
+    mouse_reset_button.pack(side='left')
+    mouse_tab_status = StringVar()
+    ttk.Label(mouse_settings, textvariable=mouse_tab_status, foreground=MUTED, wraplength=660).pack(anchor='w')
+    def refresh_mouse_settings():
+        continuous = MOUSE_STYLES[mouse_style_choice.get()] == 'continuous'
+        mouse_style_help.set('Trong góc đã chọn: chuột đi theo đầu. Vượt góc đó: giữ đầu lệch để quay liên tục.' if continuous else
+                             'Quay đầu để ngắm. Khi cần đưa đầu về giữa, giữ phím đã chọn rồi thả ra để quay tiếp.')
+        if continuous:
+            if float(mouse_deadzone_choice.get()[:-1]) == 180:
+                mouse_style_help.set('Góc bắt đầu là 180°: toàn bộ phạm vi vẫn điều khiển chuột theo đầu; không tự quay liên tục.')
+            elif float(mouse_turn_angle_choice.get()[:-1]) <= float(mouse_deadzone_choice.get()[:-1]):
+                mouse_style_help.set('Trong góc bắt đầu: chuột đi theo đầu. Vượt góc đó: quay liên tục ở tốc độ tối đa.')
+        for box in turn_boxes:
+            box.configure(state='readonly' if continuous else 'disabled')
+        turn_vertical_check.configure(state='normal' if continuous else 'disabled')
+    def change_mouse_settings(event=None):
+        output.configure(mouse_smoothing=SMOOTHING_CHOICES[mouse_smoothing_choice.get()],
+                         mouse_sensitivity=int(mouse_sensitivity_choice.get()[:-1]) / 100,
+                         mouse_controls=mouse_control_settings())
+        refresh_mouse_settings()
+        save_preferences()
+        console.append('Đã lưu thiết lập điều khiển chuột: ' + mouse_style_choice.get())
+    for box in (mouse_style_box, mouse_smooth_box, mouse_sensitive_box, clutch_key_box, *turn_boxes):
+        box.bind('<<ComboboxSelected>>', change_mouse_settings)
+    turn_vertical_check.configure(command=change_mouse_settings)
+    refresh_mouse_settings()
     ttk.Label(controls, text=tr('Chọn thêm việc app làm khi bạn bấm nút.'), wraplength=600).pack(anchor='w', pady=(0, 10))
     action_boxes = {}
     for button in ('volume_up', 'volume_down', 'brightness'):
@@ -739,7 +875,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
     ttk.Label(controls, textvariable=button_info, foreground=MUTED, wraplength=600).pack(anchor='w', pady=8)
     from event_console import EventConsole, ConnectionEvents
     console = EventConsole(frame, lambda: close(), None if ui_check else data_root / 'activity.log', tr)
-    console.pack(fill='x', pady=(10,0))
+    console.text.configure(height=3)
+    console.pack(side='bottom', fill='x', pady=(10,0), before=tabs)
     connection_events = ConnectionEvents()
     last_action.trace_add('write', lambda *_: None if localizer.refreshing else console.append(last_action.get()))
     # Capture static labels once; dynamic status strings keep their original values.
@@ -759,13 +896,18 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             widget.configure(text=tr(original))
         tabs.tab(tracking, text=tr('Theo dõi chuyển động'))
         tabs.tab(controls, text=tr('Nút trên kính'))
+        tabs.tab(mouse_settings, text=tr('Điều khiển chuột'))
         smooth_box.configure(values=[tr(name) for name in SMOOTHING_CHOICES])
+        mouse_smooth_box.configure(values=[tr(name) for name in SMOOTHING_CHOICES])
+        mouse_style_box.configure(values=[tr(name) for name in MOUSE_STYLES])
+        clutch_key_box.configure(values=[tr(name) for name in CLUTCH_KEYS])
+        turn_boxes[2].configure(values=[tr(name) for name in TURN_SPEEDS])
+        refresh_mouse_settings()
         for key, box in action_boxes.items():
             box.configure(values=[tr(name) for name in ACTION_LABELS.values()])
             box.set(tr(ACTION_LABELS[mappings[key]]))
         pair_combo.configure(values=[tr(name) for name in ACTION_LABELS.values()])
         pair_combo.set(tr(ACTION_LABELS[mappings['volume_pair']]))
-        connect_button.configure(text=tr('Kết nối kính'))
         refresh_connection_button(reader.snapshot())
         refresh_mode_controls()
         console.refresh_language()
@@ -891,6 +1033,8 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
         if waiting_center is not None and state['center_generation'] > waiting_center:
             waiting_center = None
         pose = [a * (-1 if inv.get() else 1) for a, inv in zip(state['angles_deg'], inverse)]
+        if waiting_center is not None:
+            pose = [0., 0., 0.]
         for label, value in zip(labels, pose):
             label.set(f'{value:+.1f}°')
         status.set(state['status'])
@@ -904,6 +1048,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
             output.enabled = sending.get()
             output.step(state, now, force=True)
         dispatch = output.snapshot()
+        clutch_held = dispatch['mouse_output'].get('clutch_held', False)
         transmitting = bool(sending.get() and dispatch['sending_to_game'])
         output_pose = dispatch['output_angles_deg']
         # The model observes the glasses, including while game output is paused.
@@ -932,6 +1077,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
         game_connected = (sending.get() and active and dispatch['mouse_output'].get('available', False)) if is_mouse else game_connection['connected']
         game_button.configure(style='GameConnected.TButton' if game_connected else
                               'GameWaiting.TButton' if sending.get() or output_error else 'TButton')
+        refresh_output_button()
         if game_state['registered_game_id'] != observed_game_id:
             observed_game_id = game_state['registered_game_id']
         if game_connected != observed_game_connected:
@@ -950,7 +1096,13 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 game_info.set('Game đã nhận kết nối: ' + game_state['registered_game_name']
                               if game_connected else 'Chưa có game kết nối. Mở game và vào buồng lái.')
         else:
-            game_info.set('Chưa bật kết nối với game.')
+            game_info.set('Chưa bắt đầu điều khiển chuột.' if is_mouse else 'Chưa bật kết nối với game.')
+        if is_mouse and sending.get() and clutch_held:
+            game_info.set('Đang giữ phím. Đưa đầu về giữa rồi thả phím để điều khiển tiếp.')
+        mouse_start_button.configure(text=tr('Dừng điều khiển chuột' if is_mouse and sending.get() else
+                                             'Bấm để bắt đầu điều khiển chuột'),
+                                     style=game_button.cget('style') if is_mouse else 'TButton')
+        mouse_tab_status.set(game_info.get() if is_mouse else 'Chế độ chuột chưa được chọn.')
         if transmitting:
             last_output_pose = list(output_pose)
         elif not paused:
@@ -1032,9 +1184,23 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
         def check_layout():
             nonlocal game_output, tray, last_scan
             try:
-                for page in (tracking, controls):
+                # A withdrawn Tk window can report 1x1 geometry for all
+                # children and falsely pass clipping checks. Validate mapped
+                # layout at the user's actual display scale, with fake output.
+                root.title(f'{APP_NAME} · v{APP_VERSION} [UI check]')
+                root.deiconify()
+                root.update()
+                root.update_idletasks()
+                assert console.winfo_height() >= console.winfo_reqheight(), (
+                    'console', console.winfo_height(), console.winfo_reqheight(), root.winfo_height())
+                for page in (tracking, controls, mouse_settings):
                     tabs.select(page)
+                    root.update()
                     root.update_idletasks()
+                    if page is tracking:
+                        assert sensitive_box.winfo_ismapped()
+                        assert sensitive_box.winfo_height() >= sensitive_box.winfo_reqheight(), (
+                            'sensitivity', sensitive_box.winfo_height(), sensitive_box.winfo_reqheight(), root.winfo_height())
                     def check_children(parent):
                         for widget in parent.winfo_children():
                             assert widget.winfo_y() + widget.winfo_height() <= parent.winfo_height(), (
@@ -1064,14 +1230,24 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                     reader.status = CALIBRATION_MESSAGE
                 tick()
                 assert connect_button.cget('style') == 'GameConnected.TButton'
+                assert connect_button.cget('text') == tr('Ngắt kết nối')
+                connection_language = localizer.language
+                apply_language('en', log=False)
+                assert connect_button.cget('text') == 'Disconnect'
+                assert connect_button.cget('style') == 'GameConnected.TButton'
+                apply_language('vi', log=False)
+                assert connect_button.cget('text') == 'Ngắt kết nối'
+                apply_language(connection_language, log=False)
                 assert status.get() == CALIBRATION_MESSAGE
                 with reader.lock:
                     reader.reset_connection()  # A removed cable must immediately lose green.
                 tick()
                 assert connect_button.cget('style') == 'GameWaiting.TButton'
+                assert connect_button.cget('text') == tr('Kết nối kính')
                 connect_button.invoke()
                 assert not reader.snapshot()['connection_enabled']
                 assert connect_button.cget('style') == 'TButton'
+                assert connect_button.cget('text') == tr('Kết nối kính')
                 connect_button.invoke()
                 assert reader.snapshot()['connection_enabled']
                 assert connect_button.cget('style') == 'GameWaiting.TButton'
@@ -1269,6 +1445,7 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 assert head_mode_button.cget('style') == 'GameConnected.TButton'
                 mouse_mode_button.invoke()
                 assert output_mode.get() == 'mouse' and output.mode == 'mouse'
+                assert game_button.cget('text') == tr('Bấm để bắt đầu điều khiển chuột')
                 assert mouse_mode_button.cget('style') == 'GameConnected.TButton'
                 assert head_mode_button.cget('style') == 'TButton'
                 assert not head_mode_button.instate(['disabled'])
@@ -1276,33 +1453,117 @@ def gui(resume_send=False, ui_check=False, ui_language=None):
                 assert output_mode.get() == 'headtracking'
                 mouse_mode_button.invoke()
                 old_head_feel = motion.smoothing, motion.sensitivity
-                smooth_box.current(1)
-                sensitive_box.set('120%')
-                change_feel()
+                mouse_smooth_box.current(1)
+                mouse_sensitive_box.set('120%')
+                change_mouse_settings()
                 assert mouse_motion.smoothing == .75 and mouse_output.sensitivity == 1.2
                 assert (motion.smoothing, motion.sensitivity) == old_head_feel
                 assert center.cget('text') == tr('Reset chuột')
                 resets = mouse_output.sink.centers
                 center.invoke()  # Mouse reset also works without connected glasses.
                 assert mouse_output.sink.centers == resets + 1
+                assert mouse_output.previous is None and mouse_output.neutral is None
                 assert console.latest.endswith(tr('Đã đưa chuột về giữa màn hình'))
                 apply_language('en', log=False)
                 assert center.cget('text') == 'Reset mouse'
-                assert feel_smoothing_label.cget('text') == 'Mouse smoothing:'
-                assert smooth_box.get() == 'Light'
-                assert sensitive_box.get() == '120%'
+                assert tabs.tab(mouse_settings, 'text') == 'Mouse control'
+                assert mouse_smooth_box.get() == 'Light'
+                assert mouse_sensitive_box.get() == '120%'
+                mouse_style_box.current(1)
+                clutch_key_box.current(2)
+                turn_boxes[2].current(2)
+                change_mouse_settings()
+                assert mouse_output.style == 'continuous' and mouse_output.clutch_key == CLUTCH_KEYS['F9']
+                assert mouse_output.turn_speed == TURN_SPEEDS['Nhanh']
+                assert str(turn_boxes[0].cget('state')) == 'readonly'
+                assert preferences['mouse_style'] == 'Giữ đầu lệch để quay liên tục'
+                assert turn_boxes[0].cget('values') == DEADZONE_CHOICES
+                assert turn_boxes[1].cget('values') == TURN_ANGLE_CHOICES
+                turn_boxes[0].set('180°')
+                turn_boxes[1].set('0°')
+                change_mouse_settings()
+                assert mouse_output.deadzone == 180. and mouse_output.turn_angle == 0.
+                assert preferences['mouse_deadzone'] == '180°' and preferences['mouse_turn_angle'] == '0°'
+                turn_boxes[0].set('6°')
+                turn_boxes[1].set('30°')
+                change_mouse_settings()
+                apply_language('vi', log=False)
+                assert mouse_style_choice.get() == 'Giữ đầu lệch để quay liên tục'
+                assert mouse_turn_speed_choice.get() == 'Nhanh'
+                mouse_style_box.current(0)
+                change_mouse_settings()
+                assert str(turn_boxes[0].cget('state')) == 'disabled'
+                apply_language('en', log=False)
                 game_button.invoke()
                 assert sending.get() and mouse_output.enabled and not game_output.enabled
+                assert game_button.cget('text') == 'Stop mouse control'
                 head_mode_button.invoke()  # A live connection follows the selected mode.
                 assert sending.get() and game_output.enabled and not mouse_output.enabled
                 assert output_mode.get() == 'headtracking'
+                assert game_button.cget('text') == 'Connect to game'
                 assert smoothing_choice.get() == 'Mượt vừa'
                 mouse_mode_button.invoke()
                 assert mouse_smoothing_choice.get() == 'Mượt nhẹ'
                 assert mouse_sensitivity_choice.get() == '120%'
                 game_button.invoke()
                 assert not mouse_output.enabled and not game_output.enabled
+                assert game_button.cget('text') == 'Click to start mouse control'
+                mouse_start_button.invoke()
+                assert sending.get() and output_mode.get() == 'mouse'
+                mouse_start_button.invoke()
+                assert not sending.get()
                 head_mode_button.invoke()
+                resets = mouse_output.sink.centers
+                mouse_reset_button.invoke()
+                assert mouse_output.sink.centers == resets + 1
+                assert output_mode.get() == 'headtracking' and not sending.get()
+                # Glasses volume pair, F8 and both reset buttons share the
+                # same callback. Exercise a real routed pair with a nonzero
+                # sensor pose, then acknowledge the new sensor reference.
+                mouse_mode_button.invoke()
+                mappings['volume_pair'] = 'center'
+                router.reset()
+                with reader.lock:
+                    reader.ready = True
+                    reader.updated = time.monotonic()
+                    reader.pose = (35., -12., 9.)
+                    reader.center_requested.clear()
+                tick()
+                generation = reader.snapshot()['center_generation']
+                resets = mouse_output.sink.centers
+                now = time.monotonic()
+                with reader.lock:
+                    reader.button_events.extend((('volume', 20, 30, now - .1),
+                                                  ('volume', 30, 20, now)))
+                tick()
+                assert mouse_output.sink.centers == resets + 1
+                assert reader.center_requested.is_set()
+                assert waiting_center == generation and output.waiting_center == generation
+                assert all(float(label.get().rstrip('°')) == 0. for label in labels)
+                assert console.latest.endswith(tr('Đã đưa chuột về giữa màn hình và đặt lại hướng đầu'))
+                with reader.lock:
+                    reader.center_requested.clear()
+                    reader.center_generation += 1
+                    reader.pose = (0., 0., 0.)
+                    reader.updated = time.monotonic()
+                tick()
+                assert waiting_center is None and output.waiting_center is None
+                assert all(float(label.get().rstrip('°')) == 0. for label in labels)
+                for reset_button in (center, mouse_reset_button):
+                    with reader.lock:
+                        reader.pose = (25., 15., -7.)
+                        reader.updated = time.monotonic()
+                        reader.center_requested.clear()
+                    tick()
+                    reset_button.invoke()
+                    assert reader.center_requested.is_set()
+                    tick()
+                    assert all(float(label.get().rstrip('°')) == 0. for label in labels)
+                    with reader.lock:
+                        reader.center_requested.clear()
+                        reader.center_generation += 1
+                        reader.pose = (0., 0., 0.)
+                    tick()
                 apply_language(original_language, log=False)
                 print('UI fits; bilingual controls, glasses/game states, reset, pause, background, exclusive rocker modes and independent mouse settings passed.')
             finally:

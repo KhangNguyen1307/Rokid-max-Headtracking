@@ -59,7 +59,7 @@ class TrackingOutput:
         self.sent_times = deque(maxlen=500)
 
     def configure(self, *, frequency=None, inverse=None, smoothing=None, sensitivity=None,
-                  mouse_smoothing=None, mouse_sensitivity=None):
+                  mouse_smoothing=None, mouse_sensitivity=None, mouse_controls=None):
         with self.lock:
             if frequency is not None:
                 self.cadence.set_frequency(frequency)
@@ -81,6 +81,9 @@ class TrackingOutput:
             if mouse_sensitivity is not None:
                 self.mouse.sensitivity = mouse_sensitivity
                 self.mouse.reset()
+            if mouse_controls is not None:
+                self.mouse.configure(**mouse_controls)
+                self.mouse_motion.reset()
 
     def destination(self):
         return self.mouse if self.mode == 'mouse' else self.backend if self.mode == 'headtracking' else None
@@ -125,20 +128,31 @@ class TrackingOutput:
             self.pose = self.held = [0.,0.,0.]
             self.motion.reset((0.,0.,0.))
             if self.mode == 'mouse':
-                self.mouse_motion.reset((0.,0.,0.))
-                self.mouse.center()
+                self.center_mouse(generation)
                 return
             # Reset is a control action; it must not wait for a low-rate slot.
             if self.enabled:
                 self.write(time.perf_counter())
+
+    def center_mouse(self, generation=None):
+        with self.lock:
+            self.mouse_motion.reset()
+            result = self.mouse.center()
+            if self.mode == 'mouse' and generation is not None:
+                self.waiting_center = generation
+                self.pose = self.held = [0., 0., 0.]
+            return result
 
     def write(self, now):
         try:
             destination = self.destination()
             if destination is None:
                 return False
-            written = destination.update(self.pose, active=self.active and
-                                         (self.mode != 'mouse' or not self.paused))
+            if self.mode == 'mouse':
+                written = destination.update(self.pose, active=self.active and not self.paused
+                                             and not self.mouse.clutch_held and self.waiting_center is None, now=now)
+            else:
+                written = destination.update(self.pose, active=self.active)
             if written:
                 self.sent_times.append(now)
             return bool(written)
@@ -185,6 +199,13 @@ class TrackingOutput:
             raw = [a * (-1 if inv else 1) for a,inv in zip(state['angles_deg'], self.inverse)]
             if self.mode == 'mouse':
                 raw[2] = 0.  # Tilting must not change the mouse smoothing response.
+                held = self.enabled and self.active and self.mouse.held_key()
+                if held != self.mouse.clutch_held or held:
+                    # Follow the physical head during a clutch and flush the
+                    # filter on release: never replay the return-to-center move.
+                    self.mouse_motion.reset(raw)
+                    self.mouse.reset()
+                self.mouse.clutch_held = bool(held)
             if self.paused:
                 self.pose = list(self.held)
             elif self.waiting_center is not None:

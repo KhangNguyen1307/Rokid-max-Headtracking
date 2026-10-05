@@ -6,7 +6,7 @@
 
 Theo dõi đầu và điều khiển chuột bằng kính Rokid Max trên Windows. Kết nối trực tiếp với game, không cần mở OpenTrack riêng. Headtracking đã được thử với **Microsoft Flight Simulator 2024**; các game và mẫu kính khác cần kiểm tra riêng.
 
-**Hướng dẫn và ảnh minh họa bản thử 1.10.5.** Gói đang công khai trong Releases là 1.8.1, chưa có các tùy chọn điều khiển chuột mới bên dưới.
+**Phiên bản 1.10.5 — Tiếng Việt / English.** Hướng dẫn và ảnh bên dưới dành cho bản này.
 
 ## Tải và mở ứng dụng
 

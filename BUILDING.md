@@ -24,7 +24,7 @@ Mã nguồn dùng bản pystray 0.19.5 không sửa đổi trong `third_party/py
 ## Kiểm tra
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest test_localization test_game_presence test_output_scheduler test_motion_filter test_connection test_event_console
+.\.venv\Scripts\python.exe -m unittest test_localization test_game_presence test_output_scheduler test_motion_filter test_connection test_event_console test_mouse_output
 .\.venv\Scripts\python.exe rokid_tracker.py --self-check
 .\.venv\Scripts\python.exe rokid_tracker.py --ui-check
 .\.venv\Scripts\python.exe rokid_tracker.py --ui-check --ui-language en

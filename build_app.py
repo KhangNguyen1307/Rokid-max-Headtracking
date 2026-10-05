@@ -52,6 +52,7 @@ bundle = root / 'releases' / version / 'Kariuss Max Headtracking'
 for name in ('LICENSE', 'THIRD_PARTY.md', 'THIRD_PARTY_EN.md', 'README.md', 'README_EN.md',
              'BUILDING.md', 'BUILDING_EN.md', 'Huong dan.txt', 'User Guide.txt'):
     shutil.copy2(root / name, bundle / name)
+shutil.copytree(assets, bundle / 'assets', dirs_exist_ok=True)
 shutil.copytree(root / 'licenses', bundle / 'licenses', dirs_exist_ok=True)
 shutil.copytree(root / 'third_party' / 'pystray', bundle / 'third_party' / 'pystray',
                 ignore=shutil.ignore_patterns('__pycache__', '*.pyc'), dirs_exist_ok=True)

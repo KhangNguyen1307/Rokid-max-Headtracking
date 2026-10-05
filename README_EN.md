@@ -6,7 +6,7 @@
 
 Head tracking and mouse control with Rokid Max on Windows. Connect directly to games without running OpenTrack separately. Head tracking has been tested with **Microsoft Flight Simulator 2024**; other games and glasses need separate verification.
 
-**This guide and its screenshots show trial version 1.10.5.** The public download in Releases is currently 1.8.1 and does not include the newer mouse controls described below. Screenshots use the Vietnamese interface; select **English** in the app to use the English labels shown in these instructions.
+**Version 1.10.5 — English / Vietnamese.** This guide and its screenshots show this version. Screenshots use the Vietnamese interface; select **English** in the app to use the English labels shown in these instructions.
 
 ## Download and open the app
 
